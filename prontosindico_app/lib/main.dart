@@ -38,7 +38,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      debugShowCheckedModeBanner: false,
+      debugShowCheckedModeBanner: true,
       title: 'Pronto Sindíco Template by The Flutter Way',
       theme: AppTheme.lightTheme(context),
       darkTheme: AppTheme.darkTheme(context),
