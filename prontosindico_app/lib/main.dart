@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:firebase_app_check/firebase_app_check.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -17,11 +18,10 @@ void main() async {
   
   // App Check initialization
   await FirebaseAppCheck.instance.activate(
-    // ignore: deprecated_member_use
-    androidProvider: AndroidProvider.debug,
-    // ignore: deprecated_member_use
-    appleProvider: AppleProvider.debug,
+    androidProvider: kDebugMode ? AndroidProvider.debug : AndroidProvider.playIntegrity,
+    appleProvider: kDebugMode ? AppleProvider.debug : AppleProvider.deviceCheck,
   );
+
 
   // Lê o estado do onboarding ANTES do runApp para evitar race conditions.
   // Assim, a decisão de rota é determinística desde o primeiro frame.
