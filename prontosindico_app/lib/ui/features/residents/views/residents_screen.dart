@@ -172,9 +172,11 @@ class _ResidentCard extends ConsumerWidget {
                         activeTrackColor: Colors.green,
                         inactiveThumbColor: errorColor,
                         onChanged: (value) {
-                          ref
-                              .read(residentsControllerProvider.notifier)
-                              .togglePaymentStatus(user.uid, value);
+                          if (resident.id != null) {
+                            ref
+                                .read(residentsControllerProvider.notifier)
+                                .togglePaymentStatus(resident.id!, value);
+                          }
                         },
                       ),
                     ),

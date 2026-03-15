@@ -15,10 +15,10 @@ class ResidentsController extends Notifier<ResidentsState> {
     );
   }
 
-  Future<void> togglePaymentStatus(String userId, bool hasPaid) async {
+  Future<void> togglePaymentStatus(String billId, bool hasPaid) async {
     try {
       final repository = ref.read(residentRepositoryProvider);
-      await repository.updatePaymentStatus(userId, hasPaid);
+      await repository.updatePaymentStatus(billId, hasPaid);
     } catch (e) {
       // Opcional: tratar erro de atualização ou mostrar um snackbar via UI
       state = state.copyWith(error: 'Erro ao atualizar pagamento: $e');

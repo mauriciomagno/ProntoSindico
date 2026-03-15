@@ -22,57 +22,66 @@ class ResidentRepository implements IResidentRepository {
       moradoresStream,
       boletosStream,
       (usersEvent, residentsEvent, billsEvent) {
-        final usersMap = usersEvent.snapshot.value as Map? ?? {};
-        final residentsMap = residentsEvent.snapshot.value as Map? ?? {};
-        final billsMap = billsEvent.snapshot.value as Map? ?? {};
+        final usersData = usersEvent.snapshot.value;
+        final residentsData = residentsEvent.snapshot.value;
+        final billsData = billsEvent.snapshot.value;
+
+        final Map<dynamic, dynamic> usersMap = _convertToMap(usersData);
+        final Map<dynamic, dynamic> residentsMap = _convertToMap(residentsData);
+        final Map<dynamic, dynamic> billsMap = _convertToMap(billsData);
 
         final List<Resident> residents = [];
 
-        usersMap.forEach((uid, userData) {
-          if (userData is! Map) return;
-          final userUid = uid.toString();
-          final userMapStr = Map<String, dynamic>.from(userData);
+        // Iterar sobre os boletos em vez dos usuários para garantir que todos os registros sejam vistos
+        billsMap.forEach((billId, bData) {
+          if (bData is! Map) return;
           
-          final role = UserRole.fromString(userMapStr['role']?.toString() ?? 'morador');
-          
-          final appUser = AppUser(
-            uid: userUid,
-            email: userMapStr['email']?.toString() ?? '',
-            name: userMapStr['nome']?.toString() ?? '',
-            role: role,
-            isActive: _parseAtivo(userMapStr['ativo']),
-            photoUrl: userMapStr['Foto']?.toString(),
-            phone: userMapStr['telefone']?.toString(),
-          );
+          final String userUid = bData['usuarioId']?.toString() ?? '';
+          if (userUid.isEmpty) return;
 
-          // 1. Buscar apartamento em 'moradores' (onde usuarioId == userUid)
+          // Buscar dados do usuário
+          AppUser appUser;
+          final userData = usersMap[userUid];
+          
+          if (userData is Map) {
+            final userMapStr = Map<String, dynamic>.from(userData);
+            final role = UserRole.fromString(userMapStr['role']?.toString() ?? 'morador');
+            
+            appUser = AppUser(
+              uid: userUid,
+              email: userMapStr['email']?.toString() ?? '',
+              name: userMapStr['nome']?.toString() ?? '',
+              role: role,
+              isActive: _parseAtivo(userMapStr['ativo']),
+              photoUrl: userMapStr['Foto']?.toString(),
+              phone: userMapStr['telefone']?.toString(),
+            );
+          } else {
+            // Caso o usuário não exista no nó 'usuarios', cria um placeholder
+            // para não perder o registro financeiro do boleto.
+            appUser = AppUser(
+              uid: userUid,
+              email: '',
+              name: 'Usuário Desconhecido ($userUid)',
+              role: UserRole.morador,
+              isActive: true,
+            );
+          }
+
+          // Buscar apartamento em 'moradores'
           String? apartment;
-          residentsMap.forEach((moradorId, mData) {
+          residentsMap.forEach((mId, mData) {
             if (mData is Map && mData['usuarioId'] == userUid) {
               apartment = mData['apartamento']?.toString();
             }
           });
 
-          // 2. Buscar pagamento em 'boletos'
-          // Pode ser a chave direta (userId) ou uma entrada com usuarioId
-          bool hasPaid = false;
-          if (billsMap.containsKey(userUid)) {
-            final directBill = billsMap[userUid];
-            if (directBill is Map) {
-              hasPaid = _parseAtivo(directBill['pagamentoRealizado']);
-            }
-          } else {
-            billsMap.forEach((billId, bData) {
-              if (bData is Map && bData['usuarioId'] == userUid) {
-                hasPaid = _parseAtivo(bData['pagamentoRealizado']);
-              }
-            });
-          }
-
           residents.add(Resident(
+            id: billId.toString(),
             user: appUser,
             apartment: apartment,
-            hasPaid: hasPaid,
+            hasPaid: _parseAtivo(bData['pagamentoRealizado']),
+            createdAt: _parseDate(bData['dataCriacao']),
           ));
         });
 
@@ -82,49 +91,64 @@ class ResidentRepository implements IResidentRepository {
   }
 
   @override
-  Future<void> updatePaymentStatus(String userId, bool hasPaid) async {
+  Future<void> updatePaymentStatus(String billId, bool hasPaid) async {
     final billsRef = _db.ref('boletos');
-    final snapshot = await billsRef.get();
-    
-    if (snapshot.exists) {
-      final billsMap = snapshot.value as Map? ?? {};
-      
-      // Se existe uma chave direta com o userId, atualiza ela
-      if (billsMap.containsKey(userId)) {
-        await billsRef.child(userId).update({
-          'pagamentoRealizado': hasPaid ? 'Sim' : 'Não',
-        });
-        return;
-      }
-      
-      // Caso contrário, procura a entrada que contém o usuarioId
-      String? targetBillId;
-      billsMap.forEach((billId, bData) {
-        if (bData is Map && bData['usuarioId'] == userId) {
-          targetBillId = billId.toString();
-        }
-      });
-      
-      if (targetBillId != null) {
-        await billsRef.child(targetBillId!).update({
-          'pagamentoRealizado': hasPaid ? 'Sim' : 'Não',
-        });
-      } else {
-        // Se não encontrar nada, cria uma entrada direta para garantir o funcionamento
-        await billsRef.child(userId).set({
-          'usuarioId': userId,
-          'pagamentoRealizado': hasPaid ? 'Sim' : 'Não',
-        });
-      }
-    } else {
-      // Nó de boletos vazio, cria o primeiro
-      await billsRef.child(userId).set({
-        'usuarioId': userId,
-        'pagamentoRealizado': hasPaid ? 'Sim' : 'Não',
-      });
-    }
+    // Agora atualizamos diretamente pelo ID do boleto, que é mais robusto
+    await billsRef.child(billId).update({
+      'pagamentoRealizado': hasPaid ? 'Sim' : 'Não',
+    });
   }
 
+  @override
+  Future<void> generateMonthlyBills() async {
+    final now = DateTime.now();
+    final dataCriacaoStr = "${now.day.toString().padLeft(2, '0')}/${now.month.toString().padLeft(2, '0')}/${now.year}";
+    
+    final dueDate = now.add(const Duration(days: 10));
+    final vencimentoStr = "${dueDate.day.toString().padLeft(2, '0')}/${dueDate.month.toString().padLeft(2, '0')}/${dueDate.year}";
+
+    final usersSnapshot = await _db.ref('usuarios').get();
+    final residentsSnapshot = await _db.ref('moradores').get();
+    
+    if (!usersSnapshot.exists) return;
+
+    final usersMap = usersSnapshot.value as Map? ?? {};
+    final residentsMap = residentsSnapshot.value as Map? ?? {};
+
+    final billsRef = _db.ref('boletos');
+
+    for (final entry in usersMap.entries) {
+      final userData = entry.value;
+      if (userData is! Map || userData['ativo'] != 'Sim') continue;
+      
+      final userUid = entry.key.toString();
+      
+      // Encontrar moradorId para este usuarioId
+      String? moradorId;
+      residentsMap.forEach((mId, mData) {
+        if (mData is Map && mData['usuarioId'] == userUid) {
+          moradorId = mId.toString();
+        }
+      });
+
+      if (moradorId != null) {
+        // Criar boleto para este usuário no mês atual
+        // Usamos uma chave composta por userId e mes_ano para evitar duplicidade rápida ou apenas o userId se o padrão for um boleto por vez
+        // Seguindo o código anterior, ele usa o userId como chave em alguns casos.
+        // Vamos usar o userId como chave principal para manter a simplicidade ou um push() se preferir lista.
+        // O usuário pediu "crie uma lista", então usaremos push().
+        
+        await billsRef.push().set({
+          'usuarioId': userUid,
+          'moradorId': moradorId,
+          'dataCriacao': dataCriacaoStr,
+          'pagamentoRealizado': 'Não',
+          'vencimentoPagamento': vencimentoStr,
+          'dataPagamento': '',
+        });
+      }
+    }
+  }
 
   bool _parseAtivo(dynamic value) {
     if (value == null) return false;
@@ -132,5 +156,42 @@ class ResidentRepository implements IResidentRepository {
     if (value is String) return value.toLowerCase() == 'sim';
     if (value is int) return value == 1;
     return false;
+  }
+
+  DateTime? _parseDate(dynamic value) {
+    if (value == null) return null;
+    if (value is int) return DateTime.fromMillisecondsSinceEpoch(value);
+    if (value is String) {
+      try {
+        return DateTime.parse(value);
+      } catch (_) {
+        // Tenta formato comum no Brasil dd/MM/yyyy
+        try {
+          final parts = value.split('/');
+          if (parts.length == 3) {
+            final day = int.parse(parts[0]);
+            final month = int.parse(parts[1]);
+            final year = int.parse(parts[2]);
+            return DateTime(year, month, day);
+          }
+        } catch (_) {}
+      }
+    }
+    return null;
+  }
+
+  Map<dynamic, dynamic> _convertToMap(dynamic data) {
+    if (data == null) return {};
+    if (data is Map) return data;
+    if (data is List) {
+      final Map<dynamic, dynamic> map = {};
+      for (int i = 0; i < data.length; i++) {
+        if (data[i] != null) {
+          map[i.toString()] = data[i];
+        }
+      }
+      return map;
+    }
+    return {};
   }
 }

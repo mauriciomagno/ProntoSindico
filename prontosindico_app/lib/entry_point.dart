@@ -4,6 +4,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:prontosindico/constants.dart';
 import 'package:prontosindico/route/screen_export.dart';
+import 'package:prontosindico/components/app_drawer.dart';
 
 class EntryPoint extends StatefulWidget {
   const EntryPoint({super.key});
@@ -50,8 +51,19 @@ class _EntryPointState extends State<EntryPoint> {
         // floating: true,
         // snap: true,
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-        leading: const SizedBox(),
-        leadingWidth: 0,
+        leading: Builder(
+          builder: (context) => IconButton(
+            onPressed: () => Scaffold.of(context).openDrawer(),
+            icon: SvgPicture.asset(
+              "assets/icons/DotsH.svg",
+              height: 24,
+              colorFilter: ColorFilter.mode(
+                  Theme.of(context).iconTheme.color!,
+                  BlendMode.srcIn),
+            ),
+          ),
+        ),
+        leadingWidth: 56,
         centerTitle: false,
         title: Image.asset(
           "assets/logo/logo.png",
@@ -86,6 +98,7 @@ class _EntryPointState extends State<EntryPoint> {
           ),
         ],
       ),
+      drawer: const AppDrawer(),
       // body: _pages[_currentIndex],
       body: PageTransitionSwitcher(
         duration: defaultDuration,

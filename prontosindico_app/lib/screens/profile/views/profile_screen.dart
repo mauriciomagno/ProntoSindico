@@ -7,7 +7,6 @@ import 'package:flutter_svg/svg.dart';
 import 'package:prontosindico/constants.dart';
 import 'package:prontosindico/providers/auth_provider.dart';
 import 'package:prontosindico/route/screen_export.dart';
-import 'package:prontosindico/screens/access_management_screen.dart';
 
 import 'components/profile_card.dart';
 import 'components/profile_menu_item_list_tile.dart';
@@ -26,7 +25,6 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   String _userEmail = "Carregando...";
   String _userImage =
       "https://cdn-icons-png.flaticon.com/512/149/149071.png"; // Default image
-  bool _isAdmin = false;
 
   Future<void> _confirmSignOut(BuildContext context) async {
     final confirmed = await showDialog<bool>(
@@ -76,15 +74,12 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
         _userImage = (data?['Foto'] as String?)?.isNotEmpty == true
             ? data!['Foto'] as String
             : _userImage;
-        _isAdmin = (data?['role'] as String?) == 'administrador';
       } else {
         _userName = "Usuário sem dados";
-        _isAdmin = false;
       }
     } else {
       _userName = "Usuário não logado";
       _userEmail = "";
-      _isAdmin = false;
     }
     // Update the UI
     if (mounted) {
@@ -126,27 +121,6 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 Navigator.pushNamed(context, ordersScreenRoute);
               },
             ),
-            if (_isAdmin)
-              ProfileMenuListTile(
-                text: "Gerenciar Usuários",
-                svgSrc: "assets/icons/Profile.svg",
-                press: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const AccessManagementScreen(),
-                    ),
-                  );
-                },
-              ),
-            if (_isAdmin)
-              ProfileMenuListTile(
-                text: "Gerenciar Moradores",
-                svgSrc: "assets/icons/Profile.svg",
-                press: () {
-                  Navigator.pushNamed(context, residentsScreenRoute);
-                },
-              ),
             ProfileMenuListTile(
               text: "Minhas Reservas",
               svgSrc: "assets/icons/Return.svg",

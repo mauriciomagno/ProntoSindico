@@ -6,4 +6,7 @@ abstract interface class IResidentRepository {
 
   /// Atualiza o status de pagamento do morador.
   Future<void> updatePaymentStatus(String userId, bool hasPaid);
+
+  /// Gera boletos para todos os usuários ativos no mês atual.
+  Future<void> generateMonthlyBills();
 }
