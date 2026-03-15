@@ -1,0 +1,58 @@
+﻿Analyzing prontosindico_app...                                  
+
+warning - The value of the field '_isCopied' isn't used - lib\components\buy_full_ui_kit.dart:17:14 - unused_field
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\components\cart_button.dart:69:43 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\components\list_tile\divider_list_tile.dart:33:58 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\components\list_tile\divider_list_tile.dart:85:58 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\components\product\product_card.dart:31:33 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\components\product\product_card.dart:86:51 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\components\product\product_card.dart:106:47 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\components\product\secondary_product_card.dart:34:33 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\components\review_card.dart:33:62 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\components\review_card.dart:68:24 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\components\review_card.dart:134:22 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\components\skleton\skelton.dart:49:51 - deprecated_member_use
+   info - Don't invoke 'print' in production code - lib\core\services\auth_service.dart:34:7 - avoid_print
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\entry_point.dart:41:52 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\entry_point.dart:107:35 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\entry_point.dart:128:50 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\access_management_screen.dart:211:38 - deprecated_member_use
+   info - 'activeColor' is deprecated and shouldn't be used. Use activeThumbColor or activeTrackColor instead. This feature was deprecated after v3.31.0-2.0.pre - lib\screens\access_management_screen.dart:254:31 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\access_management_screen.dart:267:58 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\access_management_screen.dart:307:23 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\access_management_screen.dart:309:42 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\auth\views\components\login_form.dart:41:28 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\auth\views\components\login_form.dart:68:28 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\auth\views\components\sign_up_form.dart:41:26 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\auth\views\components\sign_up_form.dart:69:26 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\auth\views\signup_screen.dart:43:38 - deprecated_member_use
+   info - 'activeColor' is deprecated and shouldn't be used. Use activeTrackColor instead. This feature was deprecated after v3.24.0-0.2.pre - lib\screens\preferences\views\components\prederence_list_tile.dart:41:9 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\product\views\components\notify_me_card.dart:36:24 - deprecated_member_use
+   info - 'color' is deprecated and shouldn't be used. Use colorFilter instead - lib\screens\product\views\components\notify_me_card.dart:55:23 - deprecated_member_use
+   info - 'activeColor' is deprecated and shouldn't be used. Use activeTrackColor instead. This feature was deprecated after v3.24.0-0.2.pre - lib\screens\product\views\components\notify_me_card.dart:73:19 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\product\views\components\product_images.dart:88:32 - deprecated_member_use
+   info - 'color' is deprecated and shouldn't be used. Use colorFilter instead - lib\screens\product\views\components\product_list_tile.dart:29:15 - deprecated_member_use
+   info - 'color' is deprecated and shouldn't be used. Use colorFilter instead - lib\screens\product\views\components\product_list_tile.dart:34:15 - deprecated_member_use
+   info - 'color' is deprecated and shouldn't be used. Use colorFilter instead - lib\screens\product\views\components\product_quantity.dart:38:19 - deprecated_member_use
+   info - 'color' is deprecated and shouldn't be used. Use colorFilter instead - lib\screens\product\views\components\product_quantity.dart:63:19 - deprecated_member_use
+   info - 'color' is deprecated and shouldn't be used. Use colorFilter instead - lib\screens\product\views\location_permission_store_availability_screen.dart:54:31 - deprecated_member_use
+   info - Invalid use of a private type in a public API - lib\screens\product\views\product_buy_now_screen.dart:21:3 - library_private_types_in_public_api
+   info - 'color' is deprecated and shouldn't be used. Use colorFilter instead - lib\screens\product\views\product_buy_now_screen.dart:56:23 - deprecated_member_use
+   info - 'color' is deprecated and shouldn't be used. Use colorFilter instead - lib\screens\product\views\product_details_screen.dart:55:23 - deprecated_member_use
+   info - Unnecessary use of string interpolation - lib\screens\profile\views\components\profile_card.dart:39:24 - unnecessary_string_interpolations
+   info - 'color' is deprecated and shouldn't be used. Use colorFilter instead - lib\screens\profile\views\components\profile_card.dart:72:15 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\profile\views\components\profile_card.dart:72:57 - deprecated_member_use
+warning - Unused import: 'package:prontosindico/components/list_tile/divider_list_tile.dart' - lib\screens\profile\views\profile_screen.dart:6:8 - unused_import
+warning - Unused import: 'package:prontosindico/components/network_image_with_loader.dart' - lib\screens\profile\views\profile_screen.dart:7:8 - unused_import
+   info - 'color' is deprecated and shouldn't be used. Use colorFilter instead - lib\screens\search\views\components\search_form.dart:50:15 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\search\views\components\search_form.dart:50:57 - deprecated_member_use
+   info - 'color' is deprecated and shouldn't be used. Use colorFilter instead - lib\screens\search\views\components\search_form.dart:67:23 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\user_info\views\user_info_screen.dart:112:41 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\user_info\views\user_info_screen.dart:124:41 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\user_info\views\user_info_screen.dart:398:35 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\user_info\views\user_info_screen.dart:403:37 - deprecated_member_use
+   info - 'color' is deprecated and shouldn't be used. Use colorFilter instead - lib\screens\wallet\views\components\wallet_history_card.dart:35:15 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\theme\input_decoration_theme.dart:50:60 - deprecated_member_use
+warning - A value for optional parameter 'key' isn't ever given - lib\ui\features\auth\views\auth_wrapper.dart:66:11 - unused_element_parameter
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\ui\features\auth\views\login_screen.dart:96:30 - deprecated_member_use
+

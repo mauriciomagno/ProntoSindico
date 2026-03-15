@@ -1,0 +1,91 @@
+name: prontosindico
+description: Gerencie seu condomínio com muito mais praticidade e eficiência! o aplicativo completo para facilitar o dia a dia de síndicos, administradoras e moradores.
+
+publish_to: "none"
+
+version: 1.0.0+1
+
+environment:
+  sdk: ">=3.2.0 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  cupertino_icons: ^1.0.2
+  flutter_svg: ^2.0.10+1
+  form_field_validator: ^1.1.0
+  cached_network_image: ^3.2.0
+  flutter_rating_bar: ^4.0.1
+  flutter_widget_from_html_core: ^0.17.0
+  animations: ^2.0.11
+  url_launcher: ^6.3.0
+  firebase_core: ^4.5.0
+  firebase_auth: ^6.2.0
+  google_sign_in: 6.2.2
+  firebase_database: ^12.1.4
+  firebase_storage: ^13.1.0
+  image_picker: ^1.1.2
+  flutter_animate: ^4.5.0
+  shimmer: ^3.0.0
+  flutter_riverpod: ^3.3.1
+  shared_preferences: ^2.3.2
+  firebase_app_check: ^0.4.1+5
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+  flutter_lints: ^6.0.0
+  flutter_native_splash: ^2.3.10
+  flutter_launcher_icons: ^0.14.3
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - assets/images/
+    - assets/images/onboarding/
+    - assets/icons/
+    - assets/Illustration/
+    - assets/flags/
+    - assets/logo/
+    - assets/screens/
+
+  fonts:
+    - family: Plus Jakarta
+      fonts:
+        - asset: assets/fonts/plus_jakarta/PlusJakartaDisplay-Regular.otf
+        - asset: assets/fonts/plus_jakarta/PlusJakartaDisplay-Medium.otf
+          weight: 500
+        - asset: assets/fonts/plus_jakarta/PlusJakartaDisplay-Bold.otf
+          weight: 700
+    - family: Grandis Extended
+      fonts:
+        - asset: assets/fonts/grandis_extended/GrandisExtended-Regular.ttf
+        - asset: assets/fonts/grandis_extended/GrandisExtended-Thin.ttf
+          weight: 300
+        - asset: assets/fonts/grandis_extended/GrandisExtended-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/grandis_extended/GrandisExtended-Bold.ttf
+          weight: 700
+        - asset: assets/fonts/grandis_extended/GrandisExtended-Black.ttf
+          weight: 900
+
+flutter_native_splash:
+  # Fundo idêntico ao primeiro frame do FlutterSplashScreen (opacity: 0 → escuro puro).
+  # Sem imagem — transição invisível entre native splash e animação Dart.
+  color: "#0B1019"
+  android_12:
+    color: "#0B1019"
+  fullscreen: true
+
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: "assets/logo/logo.png"
+  min_sdk_android: 21
+  web:
+    generate: false
+  windows:
+    generate: false
