@@ -139,6 +139,14 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   );
                 },
               ),
+            if (_isAdmin)
+              ProfileMenuListTile(
+                text: "Gerenciar Moradores",
+                svgSrc: "assets/icons/Profile.svg",
+                press: () {
+                  Navigator.pushNamed(context, residentsScreenRoute);
+                },
+              ),
             ProfileMenuListTile(
               text: "Minhas Reservas",
               svgSrc: "assets/icons/Return.svg",

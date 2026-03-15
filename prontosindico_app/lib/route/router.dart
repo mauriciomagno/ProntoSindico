@@ -192,6 +192,10 @@ Route<dynamic> generateRoute(RouteSettings settings) {
       return MaterialPageRoute(
         builder: (context) => const ProfileScreen(),
       );
+    case residentsScreenRoute:
+      return MaterialPageRoute(
+        builder: (context) => const ResidentsScreen(),
+      );
     // case getHelpScreenRoute:
     //   return MaterialPageRoute(
     //     builder: (context) => const GetHelpScreen(),
