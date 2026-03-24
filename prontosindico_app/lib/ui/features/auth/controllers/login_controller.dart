@@ -34,5 +34,29 @@ class LoginController extends Notifier<LoginState> {
     }
   }
 
+  Future<void> signInWithEmail(String email, String password) async {
+    if (state is LoginLoading) return;
+    state = const LoginLoading();
+
+    try {
+      final user = await _repository.signInWithEmailAndPassword(email, password);
+      if (user == null) {
+        state = const LoginError('Falha ao autenticar. Verifique seus dados.');
+        return;
+      }
+      state = const LoginSuccess();
+    } catch (e) {
+      String message = e.toString();
+      if (message.contains('invalid-credential') ||
+          message.contains('user-not-found') ||
+          message.contains('wrong-password')) {
+        message = 'Email ou senha incorretos.';
+      } else if (message.startsWith('Exception: ')) {
+        message = message.substring(11);
+      }
+      state = LoginError(message);
+    }
+  }
+
   void reset() => state = const LoginInitial();
 }

@@ -16,9 +16,8 @@ class EntryPoint extends StatefulWidget {
 class _EntryPointState extends State<EntryPoint> {
   final List _pages = const [
     HomeScreen(),
-    DiscoverScreen(),
-    // EmptyCartScreen(), // if Cart is empty
-    CartScreen(),
+    MuralScreen(),
+    ReservasScreen(),
     ProfileScreen(),
   ];
   int _currentIndex = 0;
@@ -71,32 +70,7 @@ class _EntryPointState extends State<EntryPoint> {
           height: 20,
           width: 100,
         ).animate().fadeIn().moveX(begin: -20),
-        actions: [
-          IconButton(
-            onPressed: () {
-              Navigator.pushNamed(context, searchScreenRoute);
-            },
-            icon: SvgPicture.asset(
-              "assets/icons/Search.svg",
-              height: 24,
-              colorFilter: ColorFilter.mode(
-                  Theme.of(context).textTheme.bodyLarge!.color!,
-                  BlendMode.srcIn),
-            ).animate().scale(),
-          ),
-          IconButton(
-            onPressed: () {
-              Navigator.pushNamed(context, notificationsScreenRoute);
-            },
-            icon: SvgPicture.asset(
-              "assets/icons/Notification.svg",
-              height: 24,
-              colorFilter: ColorFilter.mode(
-                  Theme.of(context).textTheme.bodyLarge!.color!,
-                  BlendMode.srcIn),
-            ).animate().shake(delay: 1.seconds),
-          ),
-        ],
+        actions: const [],
       ),
       drawer: const AppDrawer(),
       // body: _pages[_currentIndex],
@@ -154,14 +128,14 @@ class _EntryPointState extends State<EntryPoint> {
                   svgIcon("assets/icons/Category.svg", color: primaryColor)
                       .animate()
                       .scale(duration: 200.ms),
-              label: "Serviços",
+              label: "Mural",
             ),
             BottomNavigationBarItem(
               icon: svgIcon("assets/icons/Bag.svg"),
               activeIcon: svgIcon("assets/icons/Bag.svg", color: primaryColor)
                   .animate()
                   .scale(duration: 200.ms),
-              label: "Prestação de contas",
+              label: "Reservas",
             ),
             BottomNavigationBarItem(
               icon: svgIcon("assets/icons/Profile.svg"),

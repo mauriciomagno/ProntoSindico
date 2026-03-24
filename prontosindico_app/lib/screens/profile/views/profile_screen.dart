@@ -115,13 +115,6 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
 
           ...[
             ProfileMenuListTile(
-              text: "Unidades e Moradores",
-              svgSrc: "assets/icons/Order.svg",
-              press: () {
-                Navigator.pushNamed(context, ordersScreenRoute);
-              },
-            ),
-            ProfileMenuListTile(
               text: "Minhas Reservas",
               svgSrc: "assets/icons/Return.svg",
               press: () {},
@@ -130,13 +123,6 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
               text: "Boletos e Taxas",
               svgSrc: "assets/icons/Wishlist.svg",
               press: () {},
-            ),
-            ProfileMenuListTile(
-              text: "Documentos do Condomínio",
-              svgSrc: "assets/icons/Address.svg",
-              press: () {
-                Navigator.pushNamed(context, addressesScreenRoute);
-              },
             ),
           ],
 

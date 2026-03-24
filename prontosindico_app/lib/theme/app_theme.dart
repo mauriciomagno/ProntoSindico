@@ -31,10 +31,11 @@ class AppTheme {
       scrollbarTheme: scrollbarThemeData,
       dataTableTheme: dataTableLightThemeData,
       cardTheme: CardThemeData(
-        elevation: 0,
+        elevation: 2, // Subtle elevation
+        shadowColor: Colors.black.withValues(alpha: 0.1),
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(defaultBorderRadious * 1.5),
-          side: const BorderSide(color: blackColor5),
+          borderRadius: BorderRadius.circular(defaultBorderRadious),
+          side: BorderSide.none, // Remove border for cleaner look with elevation
         ),
         color: whiteColor,
       ),
@@ -67,7 +68,7 @@ class AppTheme {
       cardTheme: CardThemeData(
         elevation: 0,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(defaultBorderRadious * 1.5),
+          borderRadius: BorderRadius.circular(defaultBorderRadious),
           side: const BorderSide(color: blackColor80),
         ),
         color: blackColor,

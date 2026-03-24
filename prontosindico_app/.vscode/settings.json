@@ -1,3 +1,11 @@
 {
-    "java.configuration.updateBuildConfiguration": "automatic"
+    "java.configuration.updateBuildConfiguration": "automatic",
+    "java.configuration.runtimes": [
+        {
+            "name": "JavaSE-21",
+            "path": "D:\\Android Studio\\jbr",
+            "default": true
+        }
+    ],
+    "java.jdt.ls.java.home": "D:\\Android Studio\\jbr"
 }

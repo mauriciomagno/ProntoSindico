@@ -6,7 +6,6 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:prontosindico/constants.dart';
 import 'package:prontosindico/providers/auth_provider.dart';
 import 'package:prontosindico/route/route_constants.dart';
-import 'package:prontosindico/screens/access_management_screen.dart';
 import 'package:prontosindico/route/screen_export.dart';
 
 class AppDrawer extends ConsumerWidget {
@@ -129,28 +128,23 @@ class _AdminMenuSectionState extends ConsumerState<_AdminMenuSection> {
     return Column(
       children: [
         ListTile(
-          leading: SvgPicture.asset(
-            "assets/icons/Profile.svg",
-            height: 24,
-            colorFilter: const ColorFilter.mode(primaryColor, BlendMode.srcIn),
-          ),
-          title: const Text("Gerenciar Usuários"),
+          leading: const Icon(Icons.people_outline, color: primaryColor),
+          title: const Text("Gestão de Usuários"),
           onTap: () {
             Navigator.pop(context);
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => const AccessManagementScreen(),
-              ),
-            );
+            Navigator.pushNamed(context, accessManagementScreenRoute);
           },
         ),
         ListTile(
-          leading: SvgPicture.asset(
-            "assets/icons/Profile.svg",
-            height: 24,
-            colorFilter: const ColorFilter.mode(primaryColor, BlendMode.srcIn),
-          ),
+          leading: const Icon(Icons.bar_chart, color: primaryColor),
+          title: const Text("Relatório Financeiro"),
+          onTap: () {
+            Navigator.pop(context);
+            Navigator.pushNamed(context, financialReportScreenRoute);
+          },
+        ),
+        ListTile(
+          leading: const Icon(Icons.home_work_outlined, color: primaryColor),
           title: const Text("Gerenciar Moradores"),
           onTap: () {
             Navigator.pop(context);

@@ -1,6 +1,6 @@
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:prontosindico/components/role_based_wrapper.dart';
 import 'package:prontosindico/constants.dart';
 
@@ -24,297 +24,239 @@ class _AccessManagementView extends StatefulWidget {
 }
 
 class _AccessManagementViewState extends State<_AccessManagementView> {
-  final DatabaseReference _usuariosRef =
-      FirebaseDatabase.instance.ref('usuarios');
-
-  /// Filtro de status: null = todos, true = apenas ativos, false = apenas inativos.
+  final DatabaseReference _usuariosRef = FirebaseDatabase.instance.ref('usuarios');
   bool? _filtroAtivo;
+  String _searchQuery = '';
 
-  Future<void> _toggleAtivo(String userId, bool novoValor) async {
-    await _usuariosRef
-        .child(userId)
-        .update({'Ativo': novoValor ? 'Sim' : 'Não'});
-  }
-
-  Future<void> _confirmarToggle(
-    BuildContext context,
-    String userId,
-    String nome,
-    bool atualmenteAtivo,
-  ) async {
-    final acao = atualmenteAtivo ? 'desativar' : 'ativar';
-    final confirmar = await showDialog<bool>(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: Text('${acao[0].toUpperCase()}${acao.substring(1)} usuário'),
-        content: Text('Deseja $acao o acesso de "$nome"?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(false),
-            child: const Text('Cancelar'),
-          ),
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(true),
-            style: TextButton.styleFrom(
-              foregroundColor: atualmenteAtivo ? errorColor : Colors.green,
-            ),
-            child: Text(acao[0].toUpperCase() + acao.substring(1)),
-          ),
-        ],
-      ),
-    );
-
-    if (confirmar == true) {
-      await _toggleAtivo(userId, !atualmenteAtivo);
-    }
+  Future<void> _toggleAtivo(String userId, bool novoValue) async {
+    await _usuariosRef.child(userId).update({'Ativo': novoValue ? 'Sim' : 'Nao'});
   }
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-
     return Scaffold(
+      backgroundColor: backgroundLightColor,
       appBar: AppBar(
-        title: const Text("Gerenciar Usuários"),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: primaryColor),
+          onPressed: () => Navigator.pop(context),
+        ),
+        title: const Text(
+          'Gestao de Usuarios',
+          style: TextStyle(color: primaryColor, fontWeight: FontWeight.bold, fontSize: 18),
+        ),
+        centerTitle: true,
         actions: [
-          PopupMenuButton<bool?>(
-            icon: const Icon(Icons.filter_list),
-            tooltip: 'Filtrar por status',
-            initialValue: _filtroAtivo,
-            onSelected: (value) => setState(() => _filtroAtivo = value),
-            itemBuilder: (_) => [
-              PopupMenuItem(
-                value: null,
-                child: Row(
-                  children: [
-                    Icon(Icons.group,
-                        color: _filtroAtivo == null ? primaryColor : null,
-                        size: 20),
-                    const SizedBox(width: 8),
-                    const Text('Todos'),
-                  ],
-                ),
-              ),
-              PopupMenuItem(
-                value: true,
-                child: Row(
-                  children: [
-                    Icon(Icons.check_circle,
-                        color: _filtroAtivo == true ? Colors.green : null,
-                        size: 20),
-                    const SizedBox(width: 8),
-                    const Text('Apenas ativos'),
-                  ],
-                ),
-              ),
-              PopupMenuItem(
-                value: false,
-                child: Row(
-                  children: [
-                    Icon(Icons.cancel,
-                        color: _filtroAtivo == false ? errorColor : null,
-                        size: 20),
-                    const SizedBox(width: 8),
-                    const Text('Apenas inativos'),
-                  ],
-                ),
-              ),
-            ],
+          IconButton(
+            icon: Icon(Icons.filter_list, color: _filtroAtivo != null ? secondaryColor : primaryColor),
+            onPressed: () => _showFilterDialog(),
           ),
         ],
       ),
-      body: StreamBuilder<DatabaseEvent>(
-        stream: _usuariosRef.onValue,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          }
-          if (snapshot.hasError) {
-            return const Center(
-              child: Text('Erro ao carregar usuários.'),
-            );
-          }
-          if (!snapshot.hasData || snapshot.data!.snapshot.value == null) {
-            return const Center(child: Text('Nenhum usuário encontrado.'));
-          }
-
-          final rawMap = snapshot.data!.snapshot.value as Map<dynamic, dynamic>;
-
-          var usuarios = rawMap.entries.map((e) {
-            final dados =
-                Map<String, dynamic>.from(e.value as Map<dynamic, dynamic>);
-            dados['_uid'] = e.key as String;
-            return dados;
-          }).toList();
-
-          if (_filtroAtivo != null) {
-            usuarios = usuarios
-                .where((u) =>
-                    _filtroAtivo! ? u['Ativo'] == 'Sim' : u['Ativo'] != 'Sim')
-                .toList();
-          }
-
-          // Inativos primeiro; depois por nome
-          usuarios.sort((a, b) {
-            final aAtivo = a['Ativo'] == 'Sim';
-            final bAtivo = b['Ativo'] == 'Sim';
-            if (aAtivo != bAtivo) return aAtivo ? 1 : -1;
-            final nomeA = (a['nome'] as String? ?? '').toLowerCase();
-            final nomeB = (b['nome'] as String? ?? '').toLowerCase();
-            return nomeA.compareTo(nomeB);
-          });
-
-          if (usuarios.isEmpty) {
-            return Center(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(Icons.check_circle_outline,
-                      size: 64, color: Colors.green.shade400),
-                  const SizedBox(height: 12),
-                  Text(
-                    _filtroAtivo == false
-                        ? 'Nenhum usuário inativo.'
-                        : _filtroAtivo == true
-                            ? 'Nenhum usuário ativo.'
-                            : 'Nenhum usuário cadastrado.',
-                    style: Theme.of(context).textTheme.bodyLarge,
-                  ),
-                ],
-              ),
-            );
-          }
-
-          return ListView.separated(
-            padding: const EdgeInsets.symmetric(
-                vertical: defaultPadding, horizontal: defaultPadding / 2),
-            itemCount: usuarios.length,
-            separatorBuilder: (_, __) =>
-                const SizedBox(height: defaultPadding / 2),
-            itemBuilder: (context, index) {
-              final user = usuarios[index];
-              final String uid = user['_uid'] as String;
-              final bool isAtivo = user['Ativo'] == 'Sim';
-              final String nome =
-                  (user['nome'] as String?) ?? 'Nome não informado';
-              final String email =
-                  (user['email'] as String?) ?? 'E-mail não informado';
-              final String role = (user['role'] as String?) ?? 'morador';
-              final String? fotoUrl = user['Foto'] as String?;
-
-              return Card(
-                shape: RoundedRectangleBorder(
+      body: SafeArea(
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(defaultPadding),
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                decoration: BoxDecoration(
+                  color: Colors.white,
                   borderRadius: BorderRadius.circular(12),
-                  side: BorderSide(
-                    color: isAtivo
-                        ? Colors.transparent
-                        : errorColor.withValues(alpha: 0.4),
-                    width: 1.2,
+                  border: Border.all(color: blackColor10),
+                ),
+                child: TextField(
+                  onChanged: (v) => setState(() => _searchQuery = v.toLowerCase()),
+                  decoration: const InputDecoration(
+                    hintText: 'Buscar usuario...',
+                    hintStyle: TextStyle(fontSize: 14, color: blackColor20),
+                    icon: Icon(Icons.search, color: blackColor20, size: 20),
+                    border: InputBorder.none,
                   ),
                 ),
-                elevation: 2,
-                child: ListTile(
-                  contentPadding: const EdgeInsets.symmetric(
-                      horizontal: defaultPadding, vertical: defaultPadding / 2),
-                  leading: CircleAvatar(
-                    radius: 26,
-                    backgroundColor: colorScheme.surfaceContainerHighest,
-                    backgroundImage: (fotoUrl != null && fotoUrl.isNotEmpty)
-                        ? NetworkImage(fotoUrl)
-                        : null,
-                    child: (fotoUrl == null || fotoUrl.isEmpty)
-                        ? Text(
-                            nome.isNotEmpty ? nome[0].toUpperCase() : '?',
-                            style: const TextStyle(fontWeight: FontWeight.bold),
-                          )
-                        : null,
-                  ),
-                  title: Text(nome),
-                  subtitle: Column(
+              ),
+            ),
+            Expanded(
+              child: StreamBuilder<DatabaseEvent>(
+                stream: _usuariosRef.onValue,
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+                  if (!snapshot.hasData || snapshot.data!.snapshot.value == null) {
+                    return const Center(child: Text('Nenhum usuario encontrado.'));
+                  }
+
+                  final rawMap = snapshot.data!.snapshot.value as Map<dynamic, dynamic>;
+                  var usuarios = rawMap.entries.map((e) {
+                    final dados = Map<String, dynamic>.from(e.value as Map<dynamic, dynamic>);
+                    dados['_uid'] = e.key as String;
+                    return dados;
+                  }).toList();
+
+                  // Filters
+                  if (_filtroAtivo != null) {
+                    usuarios = usuarios.where((u) => _filtroAtivo! ? u['Ativo'] == 'Sim' : u['Ativo'] != 'Sim').toList();
+                  }
+                  if (_searchQuery.isNotEmpty) {
+                    usuarios = usuarios.where((u) {
+                      final nome = (u['nome'] as String? ?? '').toLowerCase();
+                      final email = (u['email'] as String? ?? '').toLowerCase();
+                      return nome.contains(_searchQuery) || email.contains(_searchQuery);
+                    }).toList();
+                  }
+
+                  return ListView.builder(
+                    padding: const EdgeInsets.symmetric(horizontal: defaultPadding),
+                    itemCount: usuarios.length,
+                    itemBuilder: (context, index) {
+                      final user = usuarios[index];
+                      return _buildUserCard(user).animate().fadeIn(delay: (index * 50).ms);
+                    },
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showFilterDialog() {
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+      builder: (context) => Padding(
+        padding: const EdgeInsets.all(defaultPadding),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text('Filtrar por Status', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: primaryColor)),
+            const SizedBox(height: 16),
+            ListTile(
+              leading: const Icon(Icons.group, color: blackColor40),
+              title: const Text('Todos'),
+              trailing: _filtroAtivo == null ? const Icon(Icons.check, color: secondaryColor) : null,
+              onTap: () {
+                setState(() => _filtroAtivo = null);
+                Navigator.pop(context);
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.check_circle, color: successColor),
+              title: const Text('Ativos'),
+              trailing: _filtroAtivo == true ? const Icon(Icons.check, color: secondaryColor) : null,
+              onTap: () {
+                setState(() => _filtroAtivo = true);
+                Navigator.pop(context);
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.cancel, color: errorColor),
+              title: const Text('Inativos'),
+              trailing: _filtroAtivo == false ? const Icon(Icons.check, color: secondaryColor) : null,
+              onTap: () {
+                setState(() => _filtroAtivo = false);
+                Navigator.pop(context);
+              },
+            ),
+            const SizedBox(height: 16),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildUserCard(Map<String, dynamic> user) {
+    final String uid = user['_uid'];
+    final bool isAtivo = user['Ativo'] == 'Sim';
+    final String nome = user['nome'] ?? 'Sem Nome';
+    final String email = user['email'] ?? 'Sem E-mail';
+    final String role = (user['role'] ?? 'morador').toString().toUpperCase();
+    final String? fotoUrl = user['Foto'];
+
+    return Card(
+      elevation: 0,
+      margin: const EdgeInsets.only(bottom: 12),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+        side: const BorderSide(color: blackColor10),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(12),
+        child: Column(
+          children: [
+            Row(
+              children: [
+                CircleAvatar(
+                  radius: 24,
+                  backgroundColor: blackColor10,
+                  backgroundImage: (fotoUrl != null && fotoUrl.isNotEmpty) ? NetworkImage(fotoUrl) : null,
+                  child: (fotoUrl == null || fotoUrl.isEmpty) ? Text(nome[0].toUpperCase(), style: const TextStyle(color: primaryColor, fontWeight: FontWeight.bold)) : null,
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(email, style: const TextStyle(fontSize: 12)),
-                      const SizedBox(height: 4),
                       Row(
                         children: [
-                          _RoleChip(role: role),
-                          const Spacer(),
-                          Text(
-                            isAtivo ? 'Ativo' : 'Inativo',
-                            style: TextStyle(
-                              fontSize: 11,
-                              fontWeight: FontWeight.w600,
-                              color: isAtivo ? Colors.green : errorColor,
-                            ),
-                          ),
-                          Transform.scale(
-                            scale: 0.8,
-                            child: Switch.adaptive(
-                              value: isAtivo,
-                              activeTrackColor: Colors.green,
-                              inactiveThumbColor: errorColor,
-                              onChanged: (_) =>
-                                  _confirmarToggle(context, uid, nome, isAtivo),
-                            ),
+                          Text(nome, style: const TextStyle(fontWeight: FontWeight.bold, color: blackColor80, fontSize: 15)),
+                          const SizedBox(width: 8),
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                            decoration: BoxDecoration(color: primaryColor.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(4)),
+                            child: Text(role, style: const TextStyle(fontSize: 8, fontWeight: FontWeight.bold, color: primaryColor)),
                           ),
                         ],
                       ),
+                      Text(email, style: const TextStyle(fontSize: 12, color: blackColor40)),
                     ],
                   ),
-                  trailing: SvgPicture.asset(
-                    "assets/icons/miniRight.svg",
-                    colorFilter: ColorFilter.mode(
-                      Theme.of(context).iconTheme.color!.withValues(alpha: 0.4),
-                      BlendMode.srcIn,
-                    ),
-                  ),
-                  isThreeLine: true,
                 ),
-              );
-            },
-          );
-        },
+              ],
+            ),
+            const SizedBox(height: 12),
+            const Divider(height: 1),
+            const SizedBox(height: 8),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text('Usuario Ativo', style: TextStyle(fontSize: 13, color: blackColor60)),
+                Switch.adaptive(
+                  value: isAtivo,
+                  activeColor: successColor,
+                  onChanged: (value) => _confirmToggle(uid, nome, isAtivo),
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
-}
 
-class _RoleChip extends StatelessWidget {
-  const _RoleChip({required this.role});
-
-  final String role;
-
-  Color _cor() {
-    switch (role) {
-      case 'administrador':
-        return Colors.deepPurple;
-      case 'sindico':
-        return primaryColor;
-      case 'funcionario':
-        return Colors.orange.shade700;
-      case 'portaria':
-        return Colors.teal;
-      default:
-        return Colors.blueGrey;
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-      decoration: BoxDecoration(
-        color: _cor().withValues(alpha: 0.12),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: _cor().withValues(alpha: 0.4)),
-      ),
-      child: Text(
-        role,
-        style: TextStyle(
-          fontSize: 11,
-          color: _cor(),
-          fontWeight: FontWeight.w600,
-        ),
+  void _confirmToggle(String uid, String nome, bool currentIsAtivo) {
+    final action = currentIsAtivo ? 'DESATIVAR' : 'ATIVAR';
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('$action usuario?'),
+        content: Text('Tem certeza que deseja $action o acesso de $nome?'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text('CANCELAR')),
+          TextButton(
+            onPressed: () {
+              _toggleAtivo(uid, !currentIsAtivo);
+              Navigator.pop(context);
+            },
+            child: Text(action, style: TextStyle(color: currentIsAtivo ? errorColor : successColor)),
+          ),
+        ],
       ),
     );
   }

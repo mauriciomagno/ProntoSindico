@@ -54,6 +54,20 @@ class AuthRepository implements IAuthRepository {
   }
 
   @override
+  Future<AppUser?> signInWithEmailAndPassword(
+      String email, String password) async {
+    final UserCredential userCredential =
+        await _firebaseAuth.signInWithEmailAndPassword(
+      email: email,
+      password: password,
+    );
+    final User? firebaseUser = userCredential.user;
+    if (firebaseUser == null) return null;
+
+    return fetchUserData(firebaseUser.uid);
+  }
+
+  @override
   Future<AppUser?> fetchUserData(String uid) async {
     try {
       final snapshot = await _usuariosRef.child(uid).get();

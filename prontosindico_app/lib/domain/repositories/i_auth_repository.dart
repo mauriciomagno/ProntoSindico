@@ -8,6 +8,9 @@ abstract interface class IAuthRepository {
   /// Realiza login com Google e persiste o usuário no banco se for novo.
   Future<AppUser?> signInWithGoogle();
 
+  /// Realiza login com email e senha.
+  Future<AppUser?> signInWithEmailAndPassword(String email, String password);
+
   /// Busca os dados do usuário no Realtime Database pelo [uid].
   Future<AppUser?> fetchUserData(String uid);
 
