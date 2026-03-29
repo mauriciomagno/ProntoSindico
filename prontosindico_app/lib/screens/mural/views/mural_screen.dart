@@ -10,28 +10,29 @@ class MuralScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: backgroundLightColor,
+      backgroundColor: const Color(0xFFF8FAFC),
       drawer: const AppDrawer(),
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: Builder(
           builder: (context) => IconButton(
-            icon: const Icon(Icons.menu, color: primaryColor),
+            icon: const Icon(Icons.menu, color: Color(0xFF0F172A)),
             onPressed: () => Scaffold.of(context).openDrawer(),
           ),
         ),
-        title: Image.asset(
-          'assets/logo/logo.png',
-          height: 32,
-          errorBuilder: (_, __, ___) => const Text("ProntoSindico",
-              style:
-                  TextStyle(color: primaryColor, fontWeight: FontWeight.bold)),
+        title: const Text(
+          "Mural",
+          style: TextStyle(
+            color: Color(0xFF0F172A),
+            fontWeight: FontWeight.bold,
+            fontSize: 20,
+          ),
         ),
         centerTitle: true,
         actions: [
           IconButton(
-            icon: const Icon(Icons.notifications_none, color: primaryColor),
+            icon: const Icon(Icons.notifications_none, color: Color(0xFF0F172A)),
             onPressed: () {},
           ),
         ],

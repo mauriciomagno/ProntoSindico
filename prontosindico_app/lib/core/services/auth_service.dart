@@ -75,7 +75,7 @@ class AuthService {
       "email": email,
       "nome": name,
       "role": role,
-      "ativo": "Não",
+      "ativo": false,
     });
   }
 

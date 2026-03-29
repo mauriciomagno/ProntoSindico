@@ -28,187 +28,236 @@ class _AccessManagementView extends ConsumerStatefulWidget {
 class _AccessManagementViewState extends ConsumerState<_AccessManagementView> {
   final DatabaseReference _dbRef = FirebaseDatabase.instance.ref();
   String _searchQuery = '';
+  late Stream<List<Map<String, dynamic>>> _usersStream;
+  final TextEditingController _searchController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    _usersStream = _watchDetailedUsers();
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
 
   Stream<List<Map<String, dynamic>>> _watchDetailedUsers() {
-    final usuariosStream = _dbRef.child('usuarios').onValue;
-    final moradoresStream = _dbRef.child('moradores').onValue;
+    final uStream = _dbRef.child('usuarios').onValue;
+    final mStream = _dbRef.child('moradores').onValue;
 
-    return CombineLatestStream.combine2(usuariosStream, moradoresStream, (uEvent, mEvent) {
-      final uData = uEvent.snapshot.value as Map? ?? {};
-      final mData = mEvent.snapshot.value as Map? ?? {};
+    return Rx.combineLatest2<DatabaseEvent, DatabaseEvent, List<Map<String, dynamic>>>(
+      uStream,
+      mStream,
+      (uEvent, mEvent) {
+        final List<Map<String, dynamic>> results = [];
+        final uSnapshot = uEvent.snapshot;
+        final mSnapshot = mEvent.snapshot;
 
-      final List<Map<String, dynamic>> results = [];
-      uData.forEach((uid, userData) {
-        if (userData is Map) {
-          final userMap = Map<String, dynamic>.from(userData);
-          userMap['_uid'] = uid.toString();
-          
-          // Buscar apartamento em moradores
-          String? apartamento;
-          mData.forEach((mId, moradorData) {
-            if (moradorData is Map && moradorData['usuarioId'] == uid) {
-              apartamento = moradorData['apartamento']?.toString();
+        if (!uSnapshot.exists) return results;
+
+        final Map<String, String> userToApto = {};
+        if (mSnapshot.exists) {
+          for (final mChild in mSnapshot.children) {
+            final mData = mChild.value as Map?;
+            if (mData != null) {
+              final uId = mData['usuarioId']?.toString();
+              final apto = mData['apartamento']?.toString();
+              if (uId != null && apto != null) {
+                userToApto[uId] = "Unidade $apto";
+              }
             }
-          });
-          userMap['apartamento'] = apartamento;
-          results.add(userMap);
+          }
         }
-      });
-      return results;
-    });
+
+        for (final uChild in uSnapshot.children) {
+          final uData = uChild.value as Map?;
+          if (uData != null) {
+            final userMap = Map<String, dynamic>.from(uData);
+            final id = uChild.key.toString();
+            userMap['_uid'] = id;
+            userMap['apartamento'] = userToApto[id];
+            results.add(userMap);
+          }
+        }
+        return results;
+      },
+    );
   }
 
   Future<void> _toggleAtivo(String userId, bool novoValue) async {
     await _dbRef.child('usuarios/$userId').update({
       'ativo': novoValue,
-      'Ativo': novoValue ? 'Sim' : 'Nao',
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
-      drawer: const AppDrawer(),
-      body: StreamBuilder<List<Map<String, dynamic>>>(
-        stream: _watchDetailedUsers(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          }
-          
-          final allUsers = snapshot.data ?? [];
-          final filteredUsers = allUsers.where((u) {
-            final query = _searchQuery.toLowerCase();
-            final nome = (u['nome'] ?? '').toString().toLowerCase();
-            final email = (u['email'] ?? '').toString().toLowerCase();
-            final apto = (u['apartamento'] ?? '').toString().toLowerCase();
-            return nome.contains(query) || email.contains(query) || apto.contains(query);
-          }).toList();
-
-          final int totalMoradores = allUsers.length;
-          final int ativos = allUsers.where((u) => u['ativo'] == true || u['Ativo'] == 'Sim').length;
-          final int pendentes = allUsers.where((u) => u['ativo'] == false || u['Ativo'] == 'Nao').length;
-
-          return CustomScrollView(
-            slivers: [
-              SliverToBoxAdapter(
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(20, 60, 20, 20),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          const Text(
-                            "Gestão de Usuários",
-                            style: TextStyle(
-                              fontSize: 26,
-                              fontWeight: FontWeight.bold,
-                              color: Color(0xFF0F172A),
-                            ),
-                          ),
-                          Builder(
-                            builder: (ctx) => IconButton(
-                              icon: const Icon(Icons.menu, color: primaryColor),
-                              onPressed: () => Scaffold.of(ctx).openDrawer(),
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 8),
-                      const Text(
-                        "Gerencie o acesso de moradores e atribuições de unidades em todo o complexo.",
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Color(0xFF64748B),
-                          height: 1.4,
-                        ),
-                      ),
-                      const SizedBox(height: 24),
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 16),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(12),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.03),
-                              blurRadius: 10,
-                              offset: const Offset(0, 4),
-                            ),
-                          ],
-                        ),
-                        child: TextField(
-                          onChanged: (v) => setState(() => _searchQuery = v),
-                          decoration: const InputDecoration(
-                            icon: Icon(Icons.search, color: Color(0xFF94A3B8)),
-                            hintText: "Buscar por nome ou unidade...",
-                            hintStyle: TextStyle(color: Color(0xFF94A3B8), fontSize: 14),
-                            border: InputBorder.none,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 24),
-                      SingleChildScrollView(
-                        scrollDirection: Axis.horizontal,
-                        child: Row(
-                          children: [
-                            _buildStatCard(
-                              "TOTAL DE MORADORES",
-                              totalMoradores.toString(),
-                              "+12 este mês",
-                              Icons.group,
-                              const Color(0xFFE0F2FE),
-                              const Color(0xFF0EA5E9),
-                            ),
-                            const SizedBox(width: 12),
-                            _buildStatCard(
-                              "UNIDADES ATIVAS",
-                              "$ativos / $totalMoradores",
-                              "${totalMoradores > 0 ? (ativos/totalMoradores*100).toInt() : 0}% de Ocupação",
-                              Icons.business,
-                              const Color(0xFFECFDF5),
-                              const Color(0xFF10B981),
-                            ),
-                            const SizedBox(width: 12),
-                            _buildStatCard(
-                              "ACESSOS PENDENTES",
-                              pendentes.toString().padLeft(2, '0'),
-                              "Requer aprovação",
-                              Icons.person_add,
-                              const Color(0xFFFEF2F2),
-                              const Color(0xFFEF4444),
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: 24),
-                    ],
-                  ),
-                ),
-              ),
-              SliverPadding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                sliver: SliverList(
-                  delegate: SliverChildBuilderDelegate(
-                    (context, index) {
-                      return _buildUserCard(filteredUsers[index]);
-                    },
-                    childCount: filteredUsers.length,
-                  ),
-                ),
-              ),
-              const SliverToBoxAdapter(child: SizedBox(height: 100)),
-            ],
-          );
-        },
+    return Theme(
+      data: Theme.of(context).copyWith(
+        brightness: Brightness.light,
+        inputDecorationTheme: const InputDecorationTheme(
+          hintStyle: TextStyle(color: Color(0xFF94A3B8)),
+        ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {},
-        backgroundColor: primaryColor,
-        child: const Icon(Icons.person_add_alt_1, color: Colors.white),
+      child: Scaffold(
+        backgroundColor: const Color(0xFFF8FAFC),
+        drawer: const AppDrawer(),
+        body: StreamBuilder<List<Map<String, dynamic>>>(
+          stream: _usersStream,
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(child: CircularProgressIndicator());
+            }
+
+            if (snapshot.hasError) {
+              return Center(child: Text('Erro: ${snapshot.error}'));
+            }
+            
+            final allUsers = snapshot.data ?? [];
+            final filteredUsers = allUsers.where((u) {
+              final query = _searchQuery.toLowerCase();
+              final nome = (u['nome'] ?? '').toString().toLowerCase();
+              final email = (u['email'] ?? '').toString().toLowerCase();
+              final apto = (u['apartamento'] ?? '').toString().toLowerCase();
+              return nome.contains(query) || email.contains(query) || apto.contains(query);
+            }).toList();
+
+            final int totalMoradores = allUsers.length;
+            final int ativos = allUsers.where((u) => u['ativo'] == true).length;
+            final int pendentes = allUsers.where((u) => u['ativo'] == false).length;
+
+            return CustomScrollView(
+              slivers: [
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(20, 60, 20, 20),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Text(
+                              "Gestão de Usuários",
+                              style: TextStyle(
+                                fontSize: 26,
+                                fontWeight: FontWeight.bold,
+                                color: Color(0xFF0F172A),
+                              ),
+                            ),
+                            Builder(
+                              builder: (ctx) => IconButton(
+                                icon: const Icon(Icons.menu, color: primaryColor),
+                                onPressed: () => Scaffold.of(ctx).openDrawer(),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 8),
+                        const Text(
+                          "Gerencie o acesso de moradores e atribuições de unidades em todo o complexo.",
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: Color(0xFF64748B),
+                            height: 1.4,
+                          ),
+                        ),
+                        const SizedBox(height: 24),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFF1F5F9),
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          child: TextField(
+                            controller: _searchController,
+                            onChanged: (v) => setState(() => _searchQuery = v),
+                            style: const TextStyle(color: Color(0xFF1E293B), fontSize: 15),
+                            decoration: const InputDecoration(
+                              icon: Icon(Icons.search, color: Color(0xFF94A3B8), size: 22),
+                              hintText: "Buscar por nome ou unidade...",
+                              hintStyle: TextStyle(color: Color(0xFF94A3B8), fontSize: 14),
+                              border: InputBorder.none,
+                              isDense: true,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 24),
+                        SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          child: Row(
+                            children: [
+                              _buildStatCard(
+                                "TOTAL DE MORADORES",
+                                totalMoradores.toString(),
+                                "+12 este mês",
+                                Icons.group,
+                                const Color(0xFFE0F2FE),
+                                const Color(0xFF0EA5E9),
+                              ),
+                              const SizedBox(width: 12),
+                              _buildStatCard(
+                                "UNIDADES ATIVAS",
+                                "$ativos / $totalMoradores",
+                                "${totalMoradores > 0 ? (ativos/totalMoradores*100).toInt() : 0}% de Ocupação",
+                                Icons.business,
+                                const Color(0xFFECFDF5),
+                                const Color(0xFF10B981),
+                              ),
+                              const SizedBox(width: 12),
+                              _buildStatCard(
+                                "ACESSOS PENDENTES",
+                                pendentes.toString().padLeft(2, '0'),
+                                "Requer aprovação",
+                                Icons.person_add,
+                                const Color(0xFFFEF2F2),
+                                const Color(0xFFEF4444),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 24),
+                      ],
+                    ),
+                  ),
+                ),
+                if (filteredUsers.isEmpty)
+                  SliverToBoxAdapter(
+                    child: Center(
+                      child: Padding(
+                        padding: const EdgeInsets.all(40.0),
+                        child: Column(
+                          children: [
+                            Icon(Icons.person_off_outlined, size: 64, color: Colors.grey[300]),
+                            const SizedBox(height: 16),
+                            const Text(
+                              "Nenhum usuário encontrado.",
+                              style: TextStyle(color: Color(0xFF64748B), fontSize: 16, fontWeight: FontWeight.w500),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  )
+                else
+                  SliverPadding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    sliver: SliverList(
+                      delegate: SliverChildBuilderDelegate(
+                        (context, index) {
+                          return _buildUserCard(filteredUsers[index]);
+                        },
+                        childCount: filteredUsers.length,
+                      ),
+                    ),
+                  ),
+                const SliverToBoxAdapter(child: SizedBox(height: 100)),
+              ],
+            );
+          },
+        ),
       ),
     );
   }
@@ -251,53 +300,45 @@ class _AccessManagementViewState extends ConsumerState<_AccessManagementView> {
   }
 
   Widget _buildUserCard(Map<String, dynamic> user) {
-    final bool isAtivo = user['ativo'] == true || user['Ativo'] == 'Sim';
+    final bool isAtivo = user['ativo'] == true;
     final String nome = user['nome'] ?? 'Sem Nome';
     final String email = user['email'] ?? 'Sem E-mail';
     final String? apto = user['apartamento'];
     final String? fotoUrl = user['Foto'];
 
     return Container(
-      margin: const EdgeInsets.only(bottom: 12),
+      margin: const EdgeInsets.only(bottom: 16),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFFF1F5F9)),
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.02),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
       child: Column(
         children: [
           Row(
             children: [
               CircleAvatar(
-                radius: 26,
+                radius: 28,
                 backgroundColor: const Color(0xFFF1F5F9),
                 backgroundImage: (fotoUrl != null && fotoUrl.isNotEmpty) ? NetworkImage(fotoUrl) : null,
-                child: (fotoUrl == null || fotoUrl.isEmpty) ? Text(nome[0].toUpperCase(), style: const TextStyle(color: primaryColor, fontWeight: FontWeight.bold)) : null,
+                child: (fotoUrl == null || fotoUrl.isEmpty) ? Text(nome[0].toUpperCase(), style: const TextStyle(color: primaryColor, fontWeight: FontWeight.bold, fontSize: 20)) : null,
               ),
               const SizedBox(width: 16),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(nome, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: Color(0xFF1E293B))),
+                    Text(nome, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: Color(0xFF1E293B))),
+                    const SizedBox(height: 2),
                     Text(email, style: const TextStyle(fontSize: 13, color: Color(0xFF64748B))),
                   ],
-                ),
-              ),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                decoration: BoxDecoration(
-                  color: isAtivo ? const Color(0xFFE0F7FA) : const Color(0xFFF1F5F9),
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Text(
-                  isAtivo ? "ATIVO" : "INATIVO",
-                  style: TextStyle(
-                    fontSize: 9,
-                    fontWeight: FontWeight.bold,
-                    color: isAtivo ? const Color(0xFF00ACC1) : const Color(0xFF94A3B8),
-                  ),
                 ),
               ),
             ],
@@ -305,34 +346,57 @@ class _AccessManagementViewState extends ConsumerState<_AccessManagementView> {
           const SizedBox(height: 16),
           Row(
             children: [
-              if (apto != null) ...[
+              if (apto != null)
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
                   decoration: BoxDecoration(
                     color: const Color(0xFFF1F5F9),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Text(
                     apto,
-                    style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500, color: Color(0xFF475569)),
+                    style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Color(0xFF475569)),
                   ),
                 ),
-                const Spacer(),
-              ],
-              Text(
-                isAtivo ? "Ativar" : "Desativar",
-                style: const TextStyle(fontSize: 12, color: Color(0xFF64748B)),
+              const Spacer(),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                decoration: BoxDecoration(
+                  color: isAtivo ? const Color(0xFFCCFBF1) : const Color(0xFFF1F5F9),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Text(
+                  isAtivo ? "ATIVO" : "INATIVO",
+                  style: TextStyle(
+                    fontSize: 10,
+                    fontWeight: FontWeight.bold,
+                    color: isAtivo ? const Color(0xFF0D9488) : const Color(0xFF94A3B8),
+                  ),
+                ),
               ),
-              const SizedBox(width: 8),
+            ],
+          ),
+          const SizedBox(height: 16),
+          const Divider(height: 1, color: Color(0xFFF1F5F9)),
+          const SizedBox(height: 12),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                "Desativar",
+                style: TextStyle(fontSize: 12, color: !isAtivo ? const Color(0xFF1E293B) : const Color(0xFF64748B), fontWeight: !isAtivo ? FontWeight.w600 : FontWeight.normal),
+              ),
+              const SizedBox(width: 12),
               Switch.adaptive(
                 value: isAtivo,
                 activeColor: const Color(0xFF0369A1),
+                activeTrackColor: const Color(0xFF0369A1).withValues(alpha: 0.2),
                 onChanged: (v) => _toggleAtivo(user['_uid'], v),
               ),
-              const SizedBox(width: 8),
-              const Text(
+              const SizedBox(width: 12),
+              Text(
                 "Ativar",
-                style: TextStyle(fontSize: 12, color: Color(0xFF0369A1), fontWeight: FontWeight.w500),
+                style: TextStyle(fontSize: 12, color: isAtivo ? const Color(0xFF0369A1) : const Color(0xFF64748B), fontWeight: isAtivo ? FontWeight.w600 : FontWeight.normal),
               ),
             ],
           ),
