@@ -11,8 +11,11 @@ class AppDrawer extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final userProfile = ref.watch(userProfileProvider).value;
+    final userProfileAsync = ref.watch(userProfileProvider);
+    final userProfile = userProfileAsync.valueOrNull;
     final isAdmin = userProfile?.role == UserRole.administrador;
+    final canManageBills = userProfile?.role == UserRole.administrador ||
+        userProfile?.role == UserRole.tesoureiro;
     final currentRoute = ModalRoute.of(context)?.settings.name;
 
     return Drawer(
@@ -88,20 +91,31 @@ class AppDrawer extends ConsumerWidget {
             label: "Início",
             isActive: currentRoute == homeScreenRoute || currentRoute == null,
             onTap: () {
-              Navigator.pop(context);
-              if (currentRoute != homeScreenRoute) {
-                Navigator.pushReplacementNamed(context, homeScreenRoute);
+              final navigator = Navigator.of(context);
+              if (currentRoute == homeScreenRoute || currentRoute == null) {
+                navigator.pop();
+              } else {
+                navigator.pop();
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  if (navigator.canPop()) {
+                    navigator.pushReplacementNamed(homeScreenRoute);
+                  } else {
+                    navigator.pushNamed(homeScreenRoute);
+                  }
+                });
               }
             },
           ),
           _DrawerItem(
             icon: Icons.person,
             label: "Perfil",
-            isActive: currentRoute == profileScreenRoute,
+            isActive: currentRoute == userInfoScreenRoute,
             onTap: () {
               Navigator.pop(context);
-              if (currentRoute != profileScreenRoute) {
-                Navigator.pushReplacementNamed(context, profileScreenRoute);
+              if (currentRoute != userInfoScreenRoute) {
+                Future.microtask(() {
+                  Navigator.pushReplacementNamed(context, userInfoScreenRoute);
+                });
               }
             },
           ),
@@ -113,7 +127,9 @@ class AppDrawer extends ConsumerWidget {
             onTap: () {
               Navigator.pop(context);
               if (currentRoute != muralScreenRoute) {
-                Navigator.pushReplacementNamed(context, muralScreenRoute);
+                Future.microtask(() {
+                  Navigator.pushReplacementNamed(context, muralScreenRoute);
+                });
               }
             },
           ),
@@ -124,12 +140,14 @@ class AppDrawer extends ConsumerWidget {
             onTap: () {
               Navigator.pop(context);
               if (currentRoute != reservasScreenRoute) {
-                Navigator.pushReplacementNamed(context, reservasScreenRoute);
+                Future.microtask(() {
+                  Navigator.pushReplacementNamed(context, reservasScreenRoute);
+                });
               }
             },
           ),
 
-          if (isAdmin) ...[
+          if (isAdmin || canManageBills) ...[
             const Padding(
               padding: EdgeInsets.fromLTRB(24, 20, 0, 8),
               child: Align(
@@ -145,6 +163,9 @@ class AppDrawer extends ConsumerWidget {
                 ),
               ),
             ),
+          ],
+
+          if (isAdmin) ...[
             _DrawerItem(
               icon: Icons.person_add,
               label: "Gestão de Usuários",
@@ -152,22 +173,48 @@ class AppDrawer extends ConsumerWidget {
               onTap: () {
                 Navigator.pop(context);
                 if (currentRoute != accessManagementScreenRoute) {
-                  Navigator.pushReplacementNamed(
-                      context, accessManagementScreenRoute);
+                  Future.microtask(() {
+                    Navigator.pushReplacementNamed(
+                        context, accessManagementScreenRoute);
+                  });
+                }
+              },
+            ),
+          ],
+
+          if (canManageBills) ...[
+            _DrawerItem(
+              icon: Icons.receipt_long,
+              label: "Gestão de Boletos",
+              isActive: currentRoute == residentsScreenRoute,
+              onTap: () {
+                Navigator.pop(context);
+                if (currentRoute != residentsScreenRoute) {
+                  Future.microtask(() {
+                    Navigator.pushReplacementNamed(
+                        context, residentsScreenRoute);
+                  });
                 }
               },
             ),
           ],
 
           const Spacer(),
-          
-          const Divider(indent: 20, endIndent: 20, height: 1, thickness: 0.5, color: Color(0xFFEEEEEE)),
+
+          const Divider(
+              indent: 20,
+              endIndent: 20,
+              height: 1,
+              thickness: 0.5,
+              color: Color(0xFFEEEEEE)),
 
           ListTile(
-            leading: const Icon(Icons.logout_outlined, color: Color(0xFFD32F2F)),
+            leading:
+                const Icon(Icons.logout_outlined, color: Color(0xFFD32F2F)),
             title: const Text(
               "Sair da Conta",
-              style: TextStyle(color: Color(0xFFD32F2F), fontWeight: FontWeight.w600),
+              style: TextStyle(
+                  color: Color(0xFFD32F2F), fontWeight: FontWeight.w600),
             ),
             onTap: () => _confirmSignOut(context, ref),
           ),

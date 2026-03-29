@@ -47,6 +47,59 @@ O ProntoSíndico é uma solução mobile que facilita a gestão de condomínios,
 - **Freezed** para classes imutáveis
 - **GoRouter** para navegação
 
+## 🔐 Firebase App Check - Debug Token
+
+### Por que preciso do Debug Token?
+
+O Firebase App Check protege sua API de acesso não autorizado. Em modo debug, você precisa registrar o token do seu dispositivo de desenvolvimento no Firebase Console.
+
+### Como obter o Debug Token:
+
+#### Opção 1: Via Script Automático (RECOMENDADO)
+
+**Windows (PowerShell):**
+
+```powershell
+.\get_appcheck_token.ps1
+```
+
+**Windows (CMD):**
+
+```cmd
+get_appcheck_token.bat
+```
+
+#### Opção 2: Manualmente via ADB
+
+**Windows:**
+
+```powershell
+adb logcat -s DebugAppCheckProvider:I | Select-String "token"
+```
+
+**Linux/Mac:**
+
+```bash
+adb logcat -s DebugAppCheckProvider:I | grep "token"
+```
+
+#### Opção 3: Procurar nos Logs do App
+
+1. Execute o app no dispositivo/emulador
+2. Procure no console por: **"Enter this debug token into the allow list"**
+3. O token aparecerá logo abaixo dessa mensagem
+
+### Como registrar o token no Firebase:
+
+1. Acesse: [Firebase Console](https://console.firebase.google.com/)
+2. Selecione seu projeto
+3. Vá em: **App Check** → **Apps** → Seu app Android
+4. Clique em: **"Manage debug tokens"** (Gerenciar tokens de depuração)
+5. Clique em **"Add debug token"** (Adicionar token de depuração)
+6. Cole o token copiado e salve
+
+⚠️ **IMPORTANTE**: O token é específico para cada dispositivo/emulador. Se trocar de dispositivo, precisa gerar um novo token.
+
 ### Principais Pacotes
 
 ```yaml

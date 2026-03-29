@@ -23,7 +23,7 @@ void main() async {
     // Em caso de erro aqui, o app provavelmente falhará em seguida.
   }
 
-  // App Check initialization (Check Logcat for debug token)
+  // App Check initialization - OBRIGATÓRIO para produção
   print('================================================');
   print('🔧 INICIALIZANDO FIREBASE APP CHECK...');
   print('================================================');
@@ -35,50 +35,23 @@ void main() async {
   );
 
   print('✅ App Check ativado');
-
-  // Em modo debug, exibe o token para registrar no Firebase Console
-  if (kDebugMode) {
-    print('');
-    print('================================================');
-    print('🔑 OBTENDO DEBUG TOKEN DO APP CHECK...');
-    print('================================================');
-
-    try {
-      // Aguarda um pouco para garantir que o App Check está pronto
-      await Future.delayed(const Duration(milliseconds: 500));
-      final token = await FirebaseAppCheck.instance.getToken();
-
-      if (token != null && token.isNotEmpty) {
-        print('');
-        print('╔═══════════════════════════════════════════════════════════╗');
-        print('║         🔑 FIREBASE APP CHECK DEBUG TOKEN                ║');
-        print('╠═══════════════════════════════════════════════════════════╣');
-        print('║                                                           ║');
-        print('║ COPIE O TOKEN ABAIXO:                                     ║');
-        print('║                                                           ║');
-        print('╚═══════════════════════════════════════════════════════════╝');
-        print('');
-        print('TOKEN: $token');
-        print('');
-        print('📋 COMO REGISTRAR:');
-        print('1. Acesse: https://console.firebase.google.com/');
-        print('2. Vá em: App Check → Apps → Seu App Android');
-        print('3. Clique em: "Manage debug tokens"');
-        print('4. Adicione o token acima');
-        print('');
-        print('================================================');
-      } else {
-        print('⚠️ Token retornou null ou vazio');
-        print('Verifique os logs do Android (adb logcat) para o debug token');
-      }
-    } catch (e, stackTrace) {
-      print('❌ ERRO ao obter token: $e');
-      print('Stack trace: $stackTrace');
-      print('');
-      print('💡 ALTERNATIVA: Veja o token nos logs do Android:');
-      print('Execute: adb logcat | grep -i "AppCheck"');
-    }
-  }
+  print('');
+  print('╔═══════════════════════════════════════════════════════════╗');
+  print('║   🔑 COMO OBTER O DEBUG TOKEN PARA REGISTRAR             ║');
+  print('╠═══════════════════════════════════════════════════════════╣');
+  print('║                                                           ║');
+  print('║ 1. PROCURE no console abaixo por:                        ║');
+  print('║    "Enter this debug token into the allow list"          ║');
+  print('║                                                           ║');
+  print('║ 2. OU execute este comando no terminal:                  ║');
+  print('║    adb logcat | findstr "DebugAppCheckProvider"          ║');
+  print('║                                                           ║');
+  print('║ 3. COPIE o token que aparece e registre em:              ║');
+  print('║    Firebase Console → App Check → Apps                   ║');
+  print('║    → Manage debug tokens                                 ║');
+  print('║                                                           ║');
+  print('╚═══════════════════════════════════════════════════════════╝');
+  print('');
 
   // Lê o estado do onboarding ANTES do runApp para evitar race conditions.
   // O onboarding é exibido apenas na primeira execução, em qualquer ambiente.

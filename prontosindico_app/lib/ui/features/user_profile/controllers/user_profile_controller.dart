@@ -131,6 +131,7 @@ class UserProfileController extends StateNotifier<UserProfileState> {
   static String _roleLabel(UserRole role) {
     return switch (role) {
       UserRole.administrador => 'Administrador',
+      UserRole.tesoureiro => 'Tesoureiro',
       UserRole.sindico => 'Síndico',
       UserRole.morador => 'Morador',
       UserRole.funcionario => 'Funcionário',

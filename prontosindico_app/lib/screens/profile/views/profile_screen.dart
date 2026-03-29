@@ -13,7 +13,7 @@ class ProfileScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final userProfile = ref.watch(userProfileProvider).value;
+    final userProfile = ref.watch(userProfileProvider).valueOrNull;
 
     return Scaffold(
       backgroundColor: const Color(0xFFF8FAFC),

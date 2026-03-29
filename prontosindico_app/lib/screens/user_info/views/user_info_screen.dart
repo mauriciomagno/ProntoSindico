@@ -170,67 +170,113 @@ class _UserInfoScreenState extends ConsumerState<UserInfoScreen> {
       }
     });
 
-    return Scaffold(
-      backgroundColor: backgroundLightColor,
-      drawer: const AppDrawer(),
-      appBar: _buildAppBar(state),
-      body: _buildBody(context, state),
-    );
-  }
-
-  AppBar _buildAppBar(UserProfileState state) {
     final loaded = _extractLoaded(state);
     final isSaving = state is UserProfileSaving;
 
-    return AppBar(
-      backgroundColor: Colors.transparent,
-      elevation: 0,
-      leading: Builder(
-        builder: (context) => IconButton(
-          icon: const Icon(Icons.menu, color: primaryColor),
-          onPressed: () => Scaffold.of(context).openDrawer(),
-        ),
-      ),
-      title: Image.asset(
-        'assets/logo/logo.png',
-        height: 32,
-        errorBuilder: (_, __, ___) => const Text("ProntoSindico",
-            style: TextStyle(color: primaryColor, fontWeight: FontWeight.bold)),
-      ),
-      centerTitle: true,
-      actions: [
-        if (!_isEditing && loaded != null)
-          TextButton(
-            onPressed: () => _enterEditMode(loaded),
-            child: const Text('Editar'),
-          ),
-        if (_isEditing && loaded != null)
-          TextButton(
-            onPressed: isSaving ? null : () => _cancelEdit(loaded),
-            child: const Text('Cancelar'),
-          ),
-      ],
+    return Scaffold(
+      backgroundColor: const Color(0xFFF8FAFC),
+      drawer: const AppDrawer(),
+      body: (state is UserProfileInitial || state is UserProfileLoading)
+          ? const Center(child: CircularProgressIndicator())
+          : loaded == null
+              ? _buildErrorState(state)
+              : Column(
+                  children: [
+                    // Cabeçalho fixo (congelado)
+                    Container(
+                      color: const Color(0xFFF8FAFC),
+                      child: Padding(
+                        padding: const EdgeInsets.fromLTRB(20, 60, 20, 20),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                Builder(
+                                  builder: (ctx) => IconButton(
+                                    icon: const Icon(Icons.menu,
+                                        color: primaryColor),
+                                    onPressed: () =>
+                                        Scaffold.of(ctx).openDrawer(),
+                                  ),
+                                ),
+                                const Expanded(
+                                  child: Text(
+                                    "Meu Perfil",
+                                    style: TextStyle(
+                                      fontSize: 26,
+                                      fontWeight: FontWeight.bold,
+                                      color: Color(0xFF0F172A),
+                                    ),
+                                  ),
+                                ),
+                                if (!_isEditing)
+                                  TextButton.icon(
+                                    onPressed: () => _enterEditMode(loaded),
+                                    icon: const Icon(Icons.edit,
+                                        size: 18, color: primaryColor),
+                                    label: const Text(
+                                      'Editar',
+                                      style: TextStyle(
+                                        color: primaryColor,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ),
+                                if (_isEditing)
+                                  TextButton.icon(
+                                    onPressed: isSaving
+                                        ? null
+                                        : () => _cancelEdit(loaded),
+                                    icon: const Icon(Icons.close,
+                                        size: 18, color: Color(0xFF64748B)),
+                                    label: const Text(
+                                      'Cancelar',
+                                      style: TextStyle(
+                                        color: Color(0xFF64748B),
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ),
+                              ],
+                            ),
+                            const SizedBox(height: 8),
+                            const Text(
+                              'Visualize e edite suas informações pessoais.',
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: Color(0xFF64748B),
+                                height: 1.4,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    // Conteúdo rolável
+                    Expanded(
+                      child: _buildContent(context, loaded, isSaving),
+                    ),
+                  ],
+                ),
     );
   }
 
-  Widget _buildBody(BuildContext context, UserProfileState state) {
-    if (state is UserProfileInitial || state is UserProfileLoading) {
-      return const Center(child: CircularProgressIndicator());
-    }
-
-    final loaded = _extractLoaded(state);
-    if (loaded == null) {
-      return Center(
+  Widget _buildErrorState(UserProfileState state) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(40.0),
         child: Column(
-          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(Icons.error_outline, size: 48, color: errorColor),
+            const Icon(Icons.error_outline, size: 64, color: errorColor),
             const SizedBox(height: 16),
             Text(
               state is UserProfileError ? state.message : 'Erro desconhecido',
               textAlign: TextAlign.center,
+              style: const TextStyle(fontSize: 16),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 24),
             ElevatedButton(
               onPressed: () => ref
                   .read(userProfileControllerProvider.notifier)
@@ -239,22 +285,21 @@ class _UserInfoScreenState extends ConsumerState<UserInfoScreen> {
             ),
           ],
         ),
-      );
-    }
+      ),
+    );
+  }
 
-    final isSaving = state is UserProfileSaving;
-
+  Widget _buildContent(
+      BuildContext context, UserProfileLoaded loaded, bool isSaving) {
     return AbsorbPointer(
       absorbing: isSaving,
       child: SingleChildScrollView(
-        padding: const EdgeInsets.all(defaultPadding),
+        padding: const EdgeInsets.fromLTRB(20, 0, 20, 100),
         child: Form(
           key: _formKey,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              const SizedBox(height: defaultPadding),
-
               // Avatar com botão de edição
               Center(
                 child: _ProfilePhotoWidget(
@@ -269,60 +314,83 @@ class _UserInfoScreenState extends ConsumerState<UserInfoScreen> {
 
               // Nome
               _buildLabel('Nome completo'),
-              const SizedBox(height: 6),
+              const SizedBox(height: 8),
               TextFormField(
                 controller: _nameCtrl,
                 enabled: _isEditing && !isSaving,
                 textCapitalization: TextCapitalization.words,
-                decoration: const InputDecoration(
+                style: const TextStyle(
+                  fontSize: 15,
+                  color: Color(0xFF1E293B),
+                  fontWeight: FontWeight.w500,
+                ),
+                decoration: _buildInputDecoration(
                   hintText: 'Seu nome completo',
-                  prefixIcon: Icon(Icons.person_outline),
+                  icon: Icons.person_outline,
                 ),
                 validator: (v) =>
                     v == null || v.trim().isEmpty ? 'Nome é obrigatório' : null,
               ),
 
-              const SizedBox(height: defaultPadding),
+              const SizedBox(height: 20),
 
               // Telefone
               _buildLabel('Telefone / WhatsApp'),
-              const SizedBox(height: 6),
+              const SizedBox(height: 8),
               TextFormField(
                 controller: _phoneCtrl,
                 enabled: _isEditing && !isSaving,
                 keyboardType: TextInputType.phone,
+                style: const TextStyle(
+                  fontSize: 15,
+                  color: Color(0xFF1E293B),
+                  fontWeight: FontWeight.w500,
+                ),
                 inputFormatters: [
-                  FilteringTextInputFormatter.allow(RegExp(r'[\d\s\+\(\)\-]')),
+                  FilteringTextInputFormatter.digitsOnly,
+                  _BrazilianPhoneInputFormatter(),
                 ],
-                decoration: const InputDecoration(
+                decoration: _buildInputDecoration(
                   hintText: '(11) 99999-9999',
-                  prefixIcon: Icon(Icons.phone_outlined),
+                  icon: Icons.phone_outlined,
                 ),
               ),
 
-              const SizedBox(height: defaultPadding),
+              const SizedBox(height: 20),
 
               // E-mail (somente leitura)
               _buildLabel('E-mail'),
-              const SizedBox(height: 6),
+              const SizedBox(height: 8),
               TextFormField(
                 initialValue: loaded.email,
                 enabled: false,
-                decoration: const InputDecoration(
-                  prefixIcon: Icon(Icons.email_outlined),
+                style: const TextStyle(
+                  fontSize: 15,
+                  color: Color(0xFF475569),
+                  fontWeight: FontWeight.w500,
+                ),
+                decoration: _buildInputDecoration(
+                  hintText: loaded.email,
+                  icon: Icons.email_outlined,
                 ),
               ),
 
-              const SizedBox(height: defaultPadding),
+              const SizedBox(height: 20),
 
               // Perfil (somente leitura)
               _buildLabel('Perfil de acesso'),
-              const SizedBox(height: 6),
+              const SizedBox(height: 8),
               TextFormField(
                 initialValue: loaded.role,
                 enabled: false,
-                decoration: const InputDecoration(
-                  prefixIcon: Icon(Icons.badge_outlined),
+                style: const TextStyle(
+                  fontSize: 15,
+                  color: Color(0xFF475569),
+                  fontWeight: FontWeight.w500,
+                ),
+                decoration: _buildInputDecoration(
+                  hintText: loaded.role,
+                  icon: Icons.badge_outlined,
                 ),
               ),
 
@@ -343,6 +411,16 @@ class _UserInfoScreenState extends ConsumerState<UserInfoScreen> {
                                 );
                           }
                         },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: primaryColor,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 18),
+                    elevation: 3,
+                    shadowColor: primaryColor.withOpacity(0.4),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                  ),
                   child: isSaving
                       ? const SizedBox(
                           height: 22,
@@ -352,7 +430,21 @@ class _UserInfoScreenState extends ConsumerState<UserInfoScreen> {
                             color: Colors.white,
                           ),
                         )
-                      : const Text('Salvar Alterações'),
+                      : Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Text(
+                              'Salvar Alterações',
+                              style: TextStyle(
+                                fontSize: 17,
+                                fontWeight: FontWeight.w600,
+                                letterSpacing: 0.5,
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            const Icon(Icons.arrow_forward, size: 20),
+                          ],
+                        ),
                 ),
 
               const SizedBox(height: defaultPadding),
@@ -365,11 +457,69 @@ class _UserInfoScreenState extends ConsumerState<UserInfoScreen> {
 
   Widget _buildLabel(String text) {
     return Text(
-      text,
+      text.toUpperCase(),
       style: const TextStyle(
-        fontSize: 13,
-        fontWeight: FontWeight.w600,
-        color: blackColor60,
+        fontSize: 11,
+        fontWeight: FontWeight.w700,
+        color: Color(0xFF64748B),
+        letterSpacing: 0.5,
+      ),
+    );
+  }
+
+  InputDecoration _buildInputDecoration({
+    required String hintText,
+    required IconData icon,
+  }) {
+    return InputDecoration(
+      hintText: hintText,
+      hintStyle: const TextStyle(
+        color: Color(0xFFBBBBBB),
+        fontSize: 15,
+      ),
+      prefixIcon: Icon(
+        icon,
+        color: Color(0xFF94A3B8),
+        size: 22,
+      ),
+      filled: true,
+      fillColor: const Color(0xFFF1F5F9),
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: BorderSide.none,
+      ),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: BorderSide.none,
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: const BorderSide(
+          color: primaryColor,
+          width: 1.5,
+        ),
+      ),
+      disabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: BorderSide.none,
+      ),
+      errorBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: const BorderSide(
+          color: errorColor,
+          width: 1.5,
+        ),
+      ),
+      focusedErrorBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: const BorderSide(
+          color: errorColor,
+          width: 1.5,
+        ),
+      ),
+      contentPadding: const EdgeInsets.symmetric(
+        horizontal: 16,
+        vertical: 18,
       ),
     );
   }
@@ -473,6 +623,63 @@ class _ProfilePhotoWidget extends StatelessWidget {
     return Container(
       color: blackColor5,
       child: const Icon(Icons.person, size: 52, color: blackColor40),
+    );
+  }
+}
+
+/// Formatter para telefone brasileiro (11) 99999-9999 ou (11) 9999-9999
+class _BrazilianPhoneInputFormatter extends TextInputFormatter {
+  @override
+  TextEditingValue formatEditUpdate(
+    TextEditingValue oldValue,
+    TextEditingValue newValue,
+  ) {
+    final text = newValue.text;
+    final digitsOnly = text.replaceAll(RegExp(r'\D'), '');
+
+    // Limita a 11 dígitos (DDD + número)
+    if (digitsOnly.length > 11) {
+      return oldValue;
+    }
+
+    final buffer = StringBuffer();
+    int cursorPosition = newValue.selection.end;
+    int addedChars = 0;
+
+    for (int i = 0; i < digitsOnly.length; i++) {
+      // Adiciona '(' antes do DDD
+      if (i == 0) {
+        buffer.write('(');
+        if (cursorPosition > i) addedChars++;
+      }
+
+      buffer.write(digitsOnly[i]);
+
+      // Adiciona ') ' após o DDD (2 dígitos)
+      if (i == 1) {
+        buffer.write(') ');
+        if (cursorPosition > i + 1) addedChars += 2;
+      }
+
+      // Adiciona '-' antes dos últimos 4 dígitos
+      // Para celular (11 dígitos): (11) 99999-9999
+      // Para fixo (10 dígitos): (11) 9999-9999
+      if (digitsOnly.length == 11 && i == 6) {
+        buffer.write('-');
+        if (cursorPosition > i + 1) addedChars++;
+      } else if (digitsOnly.length == 10 && i == 5) {
+        buffer.write('-');
+        if (cursorPosition > i + 1) addedChars++;
+      }
+    }
+
+    final formattedText = buffer.toString();
+    final newCursorPosition =
+        (cursorPosition + addedChars).clamp(0, formattedText.length);
+
+    return TextEditingValue(
+      text: formattedText,
+      selection: TextSelection.collapsed(offset: newCursorPosition),
     );
   }
 }

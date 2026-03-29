@@ -32,13 +32,17 @@ class ResidentRepository implements IResidentRepository {
 
         final List<Resident> residents = [];
 
-        // Iterar sobre os boletos em vez dos usuários para garantir que todos os registros sejam vistos.
-        // O novo padrão vincula boletos diretamente via moradorId e usuarioId.
-        billsMap.forEach((billId, bData) {
-          if (bData is! Map) return;
+        // Estrutura hierárquica: boletos/{moradorId}/{bol_2026_XX}
+        billsMap.forEach((moradorId, moradorBills) {
+          if (moradorBills is! Map) return;
 
-          final String userUid = bData['usuarioId']?.toString() ?? '';
-          final String moradorId = bData['moradorId']?.toString() ?? '';
+          // Buscar dados do morador
+          final moradorData = residentsMap[moradorId];
+          if (moradorData is! Map) return;
+
+          final String userUid = moradorData['usuarioId']?.toString() ?? '';
+          final String? apartment = moradorData['apartamento']?.toString();
+
           if (userUid.isEmpty) return;
 
           // Buscar dados do usuário
@@ -47,14 +51,15 @@ class ResidentRepository implements IResidentRepository {
 
           if (userData is Map) {
             final userMapStr = Map<String, dynamic>.from(userData);
-            final role = UserRole.fromString(userMapStr['role']?.toString() ?? 'morador');
+            final role = UserRole.fromString(
+                userMapStr['role']?.toString() ?? 'morador');
 
             appUser = AppUser(
               uid: userUid,
               email: userMapStr['email']?.toString() ?? '',
               name: userMapStr['nome']?.toString() ?? '',
               role: role,
-              isActive: _parseAtivo(userMapStr['ativo']), // Agora boolean no Firebase
+              isActive: _parseAtivo(userMapStr['ativo']),
               photoUrl: userMapStr['Foto']?.toString(),
               phone: userMapStr['telefone']?.toString(),
             );
@@ -68,22 +73,20 @@ class ResidentRepository implements IResidentRepository {
             );
           }
 
-          // Buscar apartamento em 'moradores' usando o moradorId direto do boleto
-          String? apartment;
-          if (moradorId.isNotEmpty) {
-            final mData = residentsMap[moradorId];
-            if (mData is Map) {
-              apartment = mData['apartamento']?.toString();
-            }
-          }
+          // Iterar sobre os boletos deste morador (bol_2026_02, bol_2026_03, etc)
+          moradorBills.forEach((billKey, bData) {
+            if (bData is! Map) return;
 
-          residents.add(Resident(
-            id: billId.toString(),
-            user: appUser,
-            apartment: apartment,
-            hasPaid: _parseAtivo(bData['pagamentoRealizado']), // Agora boolean no Firebase
-            createdAt: _parseDate(bData['dataCriacao']), // Formato yyyy-MM-dd
-          ));
+            residents.add(Resident(
+              id: '$moradorId/$billKey',
+              user: appUser,
+              apartment: apartment,
+              hasPaid: _parseAtivo(bData['pagamentoRealizado']),
+              createdAt: _parseDate(bData['dataCriacao']),
+              dueDate: _parseDate(bData['vencimentoPagamento']),
+              referenceMonth: _parseDate(bData['mesReferencia']),
+            ));
+          });
         });
 
         return residents;
@@ -93,26 +96,89 @@ class ResidentRepository implements IResidentRepository {
 
   @override
   Future<void> updatePaymentStatus(String billId, bool hasPaid) async {
+    // billId está no formato: moradorId/bol_2026_XX
+    final parts = billId.split('/');
+    if (parts.length != 2) return;
+
+    final moradorId = parts[0];
+    final billKey = parts[1];
+
     final billsRef = _db.ref('boletos');
-    // Atualiza diretamente pelo ID do boleto usando boolean, conforme o Firebase
-    await billsRef.child(billId).update({
+    await billsRef.child(moradorId).child(billKey).update({
       'pagamentoRealizado': hasPaid,
-      'dataPagamento': hasPaid ? DateTime.now().toIso8601String().substring(0, 10) : '',
+      'dataPagamento':
+          hasPaid ? DateTime.now().toIso8601String().substring(0, 10) : '',
     });
+  }
+
+  @override
+  Future<bool> checkMonthlyBillsExist() async {
+    final now = DateTime.now();
+    final currentMonth = now.toIso8601String().substring(0, 7); // yyyy-MM
+
+    final billsSnapshot = await _db.ref('boletos').get();
+    if (!billsSnapshot.exists) return false;
+
+    final billsMap = billsSnapshot.value as Map? ?? {};
+
+    // Estrutura: boletos/{moradorId}/{guid}
+    for (final moradorBills in billsMap.values) {
+      if (moradorBills is! Map) continue;
+
+      for (final billData in moradorBills.values) {
+        if (billData is! Map) continue;
+        final mesReferencia = billData['mesReferencia']?.toString();
+        if (mesReferencia == currentMonth) {
+          return true; // Encontrou boleto do mês atual
+        }
+      }
+    }
+    return false;
+  }
+
+  @override
+  Future<void> clearMonthlyBills() async {
+    final now = DateTime.now();
+    final currentMonth = now.toIso8601String().substring(0, 7); // yyyy-MM
+
+    final billsRef = _db.ref('boletos');
+    final billsSnapshot = await billsRef.get();
+    if (!billsSnapshot.exists) return;
+
+    final billsMap = billsSnapshot.value as Map? ?? {};
+
+    // Estrutura: boletos/{moradorId}/{guid}
+    for (final moradorEntry in billsMap.entries) {
+      final moradorId = moradorEntry.key.toString();
+      final moradorBills = moradorEntry.value;
+      if (moradorBills is! Map) continue;
+
+      for (final billEntry in moradorBills.entries) {
+        final billKey = billEntry.key.toString();
+        final billData = billEntry.value;
+        if (billData is! Map) continue;
+
+        final mesReferencia = billData['mesReferencia']?.toString();
+        if (mesReferencia == currentMonth) {
+          await billsRef.child(moradorId).child(billKey).remove();
+        }
+      }
+    }
   }
 
   @override
   Future<void> generateMonthlyBills() async {
     final now = DateTime.now();
-    // Datas no formato ISO yyyy-MM-dd, conforme os dados existentes no Firebase
-    final dataCriacaoStr = now.toIso8601String().substring(0, 10);
-    
-    final dueDate = DateTime(now.year, now.month + 1, now.day);
-    final vencimentoStr = dueDate.toIso8601String().substring(0, 10);
+    final dataCriacaoStr = now.toIso8601String().substring(0, 10); // yyyy-MM-dd
+    final mesReferenciaStr = now.toIso8601String().substring(0, 7); // yyyy-MM
+
+    // Vencimento: dia 10 do mês seguinte
+    final nextMonth = DateTime(now.year, now.month + 1, 10);
+    final vencimentoStr = nextMonth.toIso8601String().substring(0, 10);
 
     final usersSnapshot = await _db.ref('usuarios').get();
     final residentsSnapshot = await _db.ref('moradores').get();
-    
+
     if (!usersSnapshot.exists) return;
 
     final usersMap = usersSnapshot.value as Map? ?? {};
@@ -120,13 +186,18 @@ class ResidentRepository implements IResidentRepository {
 
     final billsRef = _db.ref('boletos');
 
+    // Verifica se o nó 'boletos' existe, se não, cria
+    final billsSnapshot = await billsRef.get();
+    if (!billsSnapshot.exists) {
+      await billsRef.set({});
+    }
+
     for (final entry in usersMap.entries) {
       final userData = entry.value;
-      // 'ativo' é boolean no novo padrão
       if (userData is! Map || _parseAtivo(userData['ativo']) != true) continue;
-      
+
       final userUid = entry.key.toString();
-      
+
       // Encontrar moradorId para este usuarioId no nó de moradores
       String? moradorId;
       residentsMap.forEach((mId, mData) {
@@ -136,14 +207,19 @@ class ResidentRepository implements IResidentRepository {
       });
 
       if (moradorId != null) {
-        // Evitar duplicatas para o mês atual se necessário (opcional, dependendo da regra de negócio)
-        await billsRef.push().set({
-          'usuarioId': userUid,
-          'moradorId': moradorId,
+        // Verifica/cria o nó do morador dentro de boletos
+        final moradorBillsRef = billsRef.child(moradorId!);
+        final moradorSnapshot = await moradorBillsRef.get();
+        if (!moradorSnapshot.exists) {
+          await moradorBillsRef.set({});
+        }
+
+        // Estrutura: boletos/{moradorId}/{guid-firebase}
+        await moradorBillsRef.push().set({
+          'mesReferencia': mesReferenciaStr,
           'dataCriacao': dataCriacaoStr,
-          'pagamentoRealizado': false, // Boolean
+          'pagamentoRealizado': false,
           'vencimentoPagamento': vencimentoStr,
-          'dataPagamento': '',
         });
       }
     }
@@ -165,6 +241,10 @@ class ResidentRepository implements IResidentRepository {
     if (value is int) return DateTime.fromMillisecondsSinceEpoch(value);
     if (value is String) {
       try {
+        // Se for formato yyyy-MM (mês de referência), adiciona dia 01
+        if (value.length == 7 && value[4] == '-') {
+          return DateTime.parse('$value-01');
+        }
         return DateTime.parse(value);
       } catch (_) {
         // Tenta formato comum no Brasil dd/MM/yyyy

@@ -1,5 +1,6 @@
 enum UserRole {
   administrador,
+  tesoureiro,
   sindico,
   morador,
   funcionario,

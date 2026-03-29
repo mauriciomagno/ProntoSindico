@@ -33,7 +33,7 @@ final userDataStreamProvider =
 );
 
 final userProfileProvider = StreamProvider.autoDispose<AppUser?>((ref) {
-  final authUser = ref.watch(authStateChangesProvider).value;
+  final authUser = ref.watch(authStateChangesProvider).valueOrNull;
   if (authUser == null) return Stream.value(null);
   return ref.watch(authRepositoryProvider).watchUserData(authUser.uid);
 });
