@@ -66,7 +66,7 @@ class CartButton extends StatelessWidget {
                     child: Container(
                       alignment: Alignment.center,
                       height: double.infinity,
-                      color: Colors.black.withValues(alpha: 0.15),
+                      color: Colors.black.withOpacity(0.15),
                       child: Text(
                         title,
                         style: Theme.of(context)

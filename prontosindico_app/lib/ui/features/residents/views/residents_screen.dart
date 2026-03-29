@@ -100,7 +100,7 @@ class _ResidentCard extends ConsumerWidget {
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
         side: BorderSide(
-          color: user.isActive ? Colors.transparent : errorColor.withValues(alpha: 0.4),
+          color: user.isActive ? Colors.transparent : errorColor.withOpacity(0.4),
           width: 1.2,
         ),
       ),
@@ -145,7 +145,7 @@ class _ResidentCard extends ConsumerWidget {
                 SvgPicture.asset(
                   "assets/icons/miniRight.svg",
                   colorFilter: ColorFilter.mode(
-                    Theme.of(context).iconTheme.color!.withValues(alpha: 0.4),
+                    Theme.of(context).iconTheme.color!.withOpacity(0.4),
                     BlendMode.srcIn,
                   ),
                 ),
@@ -235,9 +235,9 @@ class _RoleChip extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
       decoration: BoxDecoration(
-        color: _cor().withValues(alpha: 0.12),
+        color: _cor().withOpacity(0.12),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: _cor().withValues(alpha: 0.4)),
+        border: Border.all(color: _cor().withOpacity(0.4)),
       ),
       child: Text(
         role,

@@ -46,7 +46,7 @@ class CircleSkeleton extends StatelessWidget {
       // padding: const EdgeInsets.all(defaultPadding),
       decoration: BoxDecoration(
         // color: Theme.of(context).primaryColor.withOpacity(0.04),
-        color: Theme.of(context).iconTheme.color!.withValues(alpha: 0.04),
+        color: Theme.of(context).iconTheme.color!.withOpacity(0.04),
         shape: BoxShape.circle,
       ),
     );

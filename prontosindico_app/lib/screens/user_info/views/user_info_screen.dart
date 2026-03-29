@@ -110,7 +110,7 @@ class _UserInfoScreenState extends ConsumerState<UserInfoScreen> {
                 leading: Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: primaryColor.withValues(alpha: 0.1),
+                    color: primaryColor.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(defaultBorderRadious),
                   ),
                   child: const Icon(Icons.camera_alt, color: primaryColor),
@@ -122,7 +122,7 @@ class _UserInfoScreenState extends ConsumerState<UserInfoScreen> {
                 leading: Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: primaryColor.withValues(alpha: 0.1),
+                    color: primaryColor.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(defaultBorderRadious),
                   ),
                   child: const Icon(Icons.photo_library, color: primaryColor),
@@ -412,12 +412,12 @@ class _ProfilePhotoWidget extends StatelessWidget {
           decoration: BoxDecoration(
             shape: BoxShape.circle,
             border: Border.all(
-              color: primaryColor.withValues(alpha: 0.3),
+              color: primaryColor.withOpacity(0.3),
               width: 3,
             ),
             boxShadow: [
               BoxShadow(
-                color: primaryColor.withValues(alpha: 0.15),
+                color: primaryColor.withOpacity(0.15),
                 blurRadius: 12,
                 offset: const Offset(0, 4),
               ),

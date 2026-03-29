@@ -8,20 +8,18 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:prontosindico/domain/enums/user_role.dart';
 import 'package:prontosindico/ui/features/user_profile/states/user_profile_state.dart';
 
-class UserProfileController extends Notifier<UserProfileState> {
+class UserProfileController extends StateNotifier<UserProfileState> {
   late FirebaseAuth _auth;
   late DatabaseReference _usuariosRef;
   late FirebaseStorage _storage;
 
-  @override
-  UserProfileState build() {
+  UserProfileController() : super(const UserProfileInitial()) {
     _auth = FirebaseAuth.instance;
     _usuariosRef = FirebaseDatabase.instanceFor(
       app: FirebaseDatabase.instance.app,
       databaseURL: FirebaseDatabase.instance.app.options.databaseURL,
     ).ref('usuarios');
     _storage = FirebaseStorage.instance;
-    return const UserProfileInitial();
   }
 
   /// Carrega os dados do perfil do usuário autenticado.

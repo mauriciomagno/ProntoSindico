@@ -2,17 +2,24 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:prontosindico/providers/resident_providers.dart';
 import 'package:prontosindico/ui/features/residents/states/residents_state.dart';
 
-class ResidentsController extends Notifier<ResidentsState> {
-  @override
-  ResidentsState build() {
-    // Observamos o stream de moradores
-    final residentsAsync = ref.watch(residentsStreamProvider);
+class ResidentsController extends StateNotifier<ResidentsState> {
+  final Ref ref;
 
-    return residentsAsync.when(
-      data: (residents) => ResidentsState(residents: residents, isLoading: false),
-      loading: () => const ResidentsState(isLoading: true),
-      error: (err, stack) => ResidentsState(error: err.toString(), isLoading: false),
-    );
+  ResidentsController(this.ref) : super(const ResidentsState(isLoading: true)) {
+    _init();
+  }
+
+  void _init() {
+    // Observamos o stream de moradores
+    ref.listen(residentsStreamProvider, (previous, next) {
+      next.when(
+        data: (residents) =>
+            state = ResidentsState(residents: residents, isLoading: false),
+        loading: () => state = const ResidentsState(isLoading: true),
+        error: (err, stack) =>
+            state = ResidentsState(error: err.toString(), isLoading: false),
+      );
+    });
   }
 
   Future<void> togglePaymentStatus(String billId, bool hasPaid) async {
@@ -27,7 +34,6 @@ class ResidentsController extends Notifier<ResidentsState> {
 }
 
 final residentsControllerProvider =
-    NotifierProvider.autoDispose<ResidentsController, ResidentsState>(
-  ResidentsController.new,
+    StateNotifierProvider.autoDispose<ResidentsController, ResidentsState>(
+  (ref) => ResidentsController(ref),
 );
-

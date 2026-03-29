@@ -73,7 +73,7 @@ class AppDrawer extends ConsumerWidget {
                 Text(
                   userProfile?.email ?? "sindico@prontosindico.com",
                   style: TextStyle(
-                    color: Colors.white.withValues(alpha: 0.8),
+                    color: Colors.white.withOpacity(0.8),
                     fontSize: 13,
                     fontWeight: FontWeight.w400,
                   ),
@@ -181,13 +181,13 @@ class AppDrawer extends ConsumerWidget {
                   "v2.6.0-premium",
                   style: TextStyle(
                     fontSize: 11,
-                    color: Colors.black.withValues(alpha: 0.2),
+                    color: Colors.black.withOpacity(0.2),
                   ),
                 ),
                 Container(
                   width: 20,
                   height: 2,
-                  color: Colors.black.withValues(alpha: 0.1),
+                  color: Colors.black.withOpacity(0.1),
                 ),
               ],
             ),

@@ -140,7 +140,7 @@ class ReservasScreen extends StatelessWidget {
               children: [
                 Container(
                   padding: const EdgeInsets.all(10),
-                  decoration: BoxDecoration(color: primaryColor.withValues(alpha: 0.05), borderRadius: BorderRadius.circular(12)),
+                  decoration: BoxDecoration(color: primaryColor.withOpacity(0.05), borderRadius: BorderRadius.circular(12)),
                   child: Icon(icon, color: primaryColor, size: 24),
                 ),
                 const SizedBox(width: 16),
@@ -162,7 +162,7 @@ class ReservasScreen extends StatelessWidget {
                 ),
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                  decoration: BoxDecoration(color: statusColor.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(20)),
+                  decoration: BoxDecoration(color: statusColor.withOpacity(0.1), borderRadius: BorderRadius.circular(20)),
                   child: Text(status, style: TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: statusColor)),
                 ),
               ],
@@ -235,7 +235,7 @@ class ReservasScreen extends StatelessWidget {
                 Text(title, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: blackColor80)),
                 Container(
                   padding: const EdgeInsets.all(6),
-                  decoration: BoxDecoration(color: primaryColor.withValues(alpha: 0.05), shape: BoxShape.circle),
+                  decoration: BoxDecoration(color: primaryColor.withOpacity(0.05), shape: BoxShape.circle),
                   child: const Icon(Icons.arrow_forward_ios, size: 12, color: primaryColor),
                 ),
               ],

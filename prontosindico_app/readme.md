@@ -12,9 +12,35 @@ O ProntoSíndico é uma solução mobile que facilita a gestão de condomínios,
 - **Portaria** — Controle de acesso e visitantes
 - **Prestadores** — Agendamento e serviços
 
+📝 Resumo das Permissões
+
+## usuarios
+
+✅ Admin: Lista TODOS os usuários (raiz)
+✅ Usuário: Lê apenas o próprio perfil ($uid)
+✅ Admin: Edita qualquer perfil
+✅ Usuário: Edita apenas o próprio perfil
+
+## boletos
+
+✅ Admin/Tesoureiro: Lê TODOS os boletos (raiz e filhos)
+✅ Morador: Lê apenas os próprios boletos
+✅ Admin/Tesoureiro: Cria/edita qualquer boleto
+
+## moradores
+
+✅ Todos autenticados: Podem ler
+✅ Apenas Admin: Pode editar
+
+## config
+
+✅ Todos autenticados: Podem ler
+✅ Apenas Admin: Pode editar
+
 ## 🚀 Tecnologias
 
 ### Core Stack
+
 - **Flutter** (3.24.0) + **Dart** (3.5.0)
 - **Firebase** (Authentication, Firestore, Storage, Messaging, Crashlytics)
 - **Riverpod** + **StateNotifier** para gerenciamento de estado
@@ -22,6 +48,7 @@ O ProntoSíndico é uma solução mobile que facilita a gestão de condomínios,
 - **GoRouter** para navegação
 
 ### Principais Pacotes
+
 ```yaml
 # Firebase
 firebase_core: ^2.24.2
@@ -120,7 +147,7 @@ lib/
     ├── extensions/
     ├── formatters/
     └── validators/
-	
+
 	🏗️ Arquitetura
 Clean Architecture + MVVM
 
@@ -144,7 +171,7 @@ abstract class AvisoRepository {
 
 class FirebaseAvisoRepository implements AvisoRepository {
   final FirebaseFirestore _firestore;
-  
+
   @override
   Stream<List<Aviso>> getAvisos() {
     return _firestore
@@ -171,9 +198,9 @@ class AvisoState with _$AvisoState {
 // controllers/aviso_controller.dart
 class AvisoController extends StateNotifier<AvisoState> {
   AvisoController(this._repository) : super(const AvisoState.initial());
-  
+
   final AvisoRepository _repository;
-  
+
   Future<void> loadAvisos() async {
     state = const AvisoState.loading();
     try {
@@ -194,24 +221,24 @@ service cloud.firestore {
     function isAuthenticated() {
       return request.auth != null;
     }
-    
+
     function getUserRole(condominioId) {
       return get(/databases/$(database)/documents/condominios/$(condominioId)/usuarios/$(request.auth.uid)).data.perfil;
     }
-    
+
     match /condominios/{condominioId} {
       allow read: if isAuthenticated();
-      
+
       match /avisos/{avisoId} {
         allow read: if isAuthenticated();
         allow write: if isAuthenticated() && getUserRole(condominioId) in ['sindico', 'administrador'];
       }
-      
+
       match /reservas/{reservaId} {
         allow read: if isAuthenticated();
         allow create: if isAuthenticated() && getUserRole(condominioId) in ['morador', 'sindico'];
         allow update: if isAuthenticated() && (
-          resource.data.usuarioId == request.auth.uid || 
+          resource.data.usuarioId == request.auth.uid ||
           getUserRole(condominioId) == 'sindico'
         );
       }
@@ -234,13 +261,13 @@ PROD	main.dart	firebase_options_prod.dart	Produção
 Pré-requisitos
     Flutter SDK (3.24.0 ou superior)
     Dart SDK (3.5.0 ou superior)
-    Firebase CLI (para desenvolvimento) 
+    Firebase CLI (para desenvolvimento)
 		url: https://prontosindico-59bd4-default-rtdb.firebaseio.com
     Android Studio / Xcode (para emuladores)
 
 Passos
     Clone o repositório
-	
+
 git clone https://github.com/seu-org/prontosindico.git
 cd prontosindico
 
@@ -306,7 +333,7 @@ Nomenclatura
     Variáveis/métodos: camelCase
     Arquivos: snake_case.dart
     Constantes: UPPER_CASE
-	
+
 Commits (Conventional Commits)
 
 feat: adicionar módulo de reservas
@@ -353,6 +380,7 @@ Para questões técnicas, entre em contato com o squad de desenvolvimento:
     Tech Lead: [email]
     Product Owner: [email]
     Squad Mobile: [email]
-	
-ProntoSíndico — Simplificando a gestão do seu condomínio 🏢	
-	
+
+ProntoSíndico — Simplificando a gestão do seu condomínio 🏢
+
+```

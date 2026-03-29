@@ -314,7 +314,7 @@ class _AccessManagementViewState extends ConsumerState<_AccessManagementView> {
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.02),
+            color: Colors.black.withOpacity(0.02),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -390,7 +390,7 @@ class _AccessManagementViewState extends ConsumerState<_AccessManagementView> {
               Switch.adaptive(
                 value: isAtivo,
                 activeColor: const Color(0xFF0369A1),
-                activeTrackColor: const Color(0xFF0369A1).withValues(alpha: 0.2),
+                activeTrackColor: const Color(0xFF0369A1).withOpacity(0.2),
                 onChanged: (v) => _toggleAtivo(user['_uid'], v),
               ),
               const SizedBox(width: 12),
