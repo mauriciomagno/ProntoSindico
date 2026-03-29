@@ -10,7 +10,7 @@ plugins {
 
 android {
     namespace = "com.prontosindico.prontosindico"
-    compileSdk = 35  // Atualizado para suportar plugins mais recentes
+    compileSdk = 36  // Atualizado para suportar plugins mais recentes
     ndkVersion = "27.0.12077973"  // Versão requerida pelos plugins Firebase
 
     externalNativeBuild {
@@ -33,7 +33,7 @@ android {
         applicationId = "com.prontosindico.prontosindico"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
-        minSdk = 23  // Requerido pelo firebase_app_check e outros plugins
+        minSdk = flutter.minSdkVersion  // Requerido pelo firebase_app_check e outros plugins
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName

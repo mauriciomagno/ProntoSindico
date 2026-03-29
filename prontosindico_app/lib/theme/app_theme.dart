@@ -30,7 +30,7 @@ class AppTheme {
       appBarTheme: appBarLightTheme,
       scrollbarTheme: scrollbarThemeData,
       dataTableTheme: dataTableLightThemeData,
-      cardTheme: const CardTheme(
+      cardTheme: const CardThemeData(
         elevation: 2, // Subtle elevation
         shadowColor: Color(0x1A000000),
         shape: RoundedRectangleBorder(
@@ -67,7 +67,7 @@ class AppTheme {
       appBarTheme: appBarDarkTheme,
       scrollbarTheme: scrollbarThemeData,
       dataTableTheme: dataTableDarkThemeData,
-      cardTheme: const CardTheme(
+      cardTheme: const CardThemeData(
         elevation: 0,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.all(Radius.circular(defaultBorderRadious)),
