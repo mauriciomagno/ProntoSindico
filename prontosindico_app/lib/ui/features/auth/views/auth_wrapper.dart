@@ -16,8 +16,12 @@ class AuthWrapper extends ConsumerWidget {
 
     return authState.when(
       loading: () => const AuthLoadingScreen(),
-      error: (_, __) => const LoginScreen(),
+      error: (e, s) {
+        debugPrint('[AuthWrapper] Error: $e');
+        return const LoginScreen();
+      },
       data: (firebaseUser) {
+        debugPrint('[AuthWrapper] firebaseUser: ${firebaseUser?.uid}');
         if (firebaseUser == null) return const LoginScreen();
         return _UserDataGate(uid: firebaseUser.uid);
       },
@@ -38,17 +42,35 @@ class _UserDataGate extends ConsumerWidget {
 
     return userAsync.when(
       loading: () => const AuthLoadingScreen(),
-      error: (error, _) => _UserDataErrorScreen(
-        message: 'Erro ao carregar dados do usuário.\n${error.toString()}',
-        onRetry: () => ref.invalidate(userDataStreamProvider(uid)),
-      ),
+      error: (error, _) {
+        debugPrint('[UserDataGate] Error fetching user data: $error');
+        return _UserDataErrorScreen(
+          message: 'Erro ao carregar dados do usuário.\n${error.toString()}',
+          onRetry: () => ref.invalidate(userDataStreamProvider(uid)),
+        );
+      },
       data: (appUser) {
+        debugPrint('[UserDataGate] appUser: ${appUser?.email}, isActive: ${appUser?.isActive}, role: ${appUser?.role}');
         if (appUser == null) {
-          // Dados não encontrados: faz logout e volta ao login
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            ref.read(authRepositoryProvider).signOut();
-          });
-          return const AuthLoadingScreen();
+          // Se não encontrar os dados, tentamos observar por mais tempo 
+          // ou mostramos uma tela de erro em vez de deslogar imediatamente.
+          return Scaffold(
+            body: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const CircularProgressIndicator(),
+                  const SizedBox(height: 20),
+                  Text('Aguardando sincronização de dados...\nUID: $uid'),
+                  const SizedBox(height: 10),
+                  TextButton(
+                    onPressed: () => ref.read(authRepositoryProvider).signOut(),
+                    child: const Text('Cancelar e Sair'),
+                  ),
+                ],
+              ),
+            ),
+          );
         }
         if (!appUser.isActive) {
           // Bloqueia o acesso e exibe mensagem informativa.

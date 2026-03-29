@@ -1,4 +1,4 @@
-export 'package:prontosindico/screens/onbording/views/onbording_screnn.dart';
+export 'package:prontosindico/screens/onbording/views/onboarding_screen.dart';
 export 'package:prontosindico/screens/auth/views/login_screen.dart';
 export 'package:prontosindico/screens/auth/views/signup_screen.dart';
 

@@ -1,9 +1,7 @@
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:prontosindico/constants.dart';
+import 'package:prontosindico/domain/enums/user_role.dart';
 import 'package:prontosindico/providers/auth_provider.dart';
 import 'package:prontosindico/route/route_constants.dart';
 import 'package:prontosindico/route/screen_export.dart';
@@ -13,52 +11,187 @@ class AppDrawer extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // Para simplificar, usamos o mesmo mecanismo do ProfileScreen ou observamos o authRepository
-    // Aqui vamos buscar o usuário atual do Firebase Auth para checar a role no BD
-    // Mas para ser mais eficiente com Riverpod, poderíamos ter um roleProvider.
-    // Por enquanto, vamos usar uma lógica similar à do ProfileScreen buscando do banco.
+    final userProfile = ref.watch(userProfileProvider).value;
+    final isAdmin = userProfile?.role == UserRole.administrador;
+    final currentRoute = ModalRoute.of(context)?.settings.name;
 
     return Drawer(
+      backgroundColor: Colors.white,
       child: Column(
         children: [
-          UserAccountsDrawerHeader(
-            decoration: const BoxDecoration(color: primaryColor),
-            accountName: const Text("Pronto Síndico"),
-            accountEmail: const Text("Administração"),
-            currentAccountPicture: CircleAvatar(
-              backgroundColor: Colors.white,
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Image.asset("assets/logo/logo.png"),
+          // Final Premium Header
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.fromLTRB(20, 60, 20, 24),
+            decoration: const BoxDecoration(
+              color: primaryColor,
+              borderRadius: BorderRadius.only(
+                bottomRight: Radius.circular(36),
               ),
             ),
-          ),
-          ListTile(
-            leading: SvgPicture.asset(
-              "assets/icons/ProntoSindico.svg",
-              height: 24,
-              colorFilter:
-                  const ColorFilter.mode(primaryColor, BlendMode.srcIn),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(2),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(10),
+                    child: (userProfile?.photoUrl != null &&
+                            userProfile!.photoUrl!.isNotEmpty)
+                        ? Image.network(
+                            userProfile.photoUrl!,
+                            width: 54,
+                            height: 54,
+                            fit: BoxFit.cover,
+                            errorBuilder: (_, __, ___) => Image.asset(
+                              "assets/logo/logo.png",
+                              width: 54,
+                              height: 54,
+                            ),
+                          )
+                        : Image.asset(
+                            "assets/logo/logo.png",
+                            width: 54,
+                            height: 54,
+                          ),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  userProfile?.name ?? "Pronto Síndico",
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  userProfile?.email ?? "sindico@prontosindico.com",
+                  style: TextStyle(
+                    color: Colors.white.withValues(alpha: 0.8),
+                    fontSize: 13,
+                    fontWeight: FontWeight.w400,
+                  ),
+                ),
+              ],
             ),
-            title: const Text("Início"),
-            onTap: () => Navigator.pop(context),
           ),
-          // Itens de Gerenciamento (Apenas para Admin)
-          // Nota: Seria melhor usar um provider para _isAdmin, mas vamos seguir o fluxo atual
-          _AdminMenuSection(),
+          const SizedBox(height: 12),
+
+          _DrawerItem(
+            icon: Icons.home,
+            label: "Início",
+            isActive: currentRoute == homeScreenRoute || currentRoute == null,
+            onTap: () {
+              Navigator.pop(context);
+              if (currentRoute != homeScreenRoute) {
+                Navigator.pushReplacementNamed(context, homeScreenRoute);
+              }
+            },
+          ),
+          _DrawerItem(
+            icon: Icons.person,
+            label: "Perfil",
+            isActive: currentRoute == profileScreenRoute,
+            onTap: () {
+              Navigator.pop(context);
+              if (currentRoute != profileScreenRoute) {
+                Navigator.pushReplacementNamed(context, profileScreenRoute);
+              }
+            },
+          ),
+          _DrawerItem(
+            icon: Icons.notifications,
+            label: "Avisos",
+            hasBadge: true,
+            isActive: currentRoute == muralScreenRoute,
+            onTap: () {
+              Navigator.pop(context);
+              if (currentRoute != muralScreenRoute) {
+                Navigator.pushReplacementNamed(context, muralScreenRoute);
+              }
+            },
+          ),
+          _DrawerItem(
+            icon: Icons.calendar_today,
+            label: "Reservas",
+            isActive: currentRoute == reservasScreenRoute,
+            onTap: () {
+              Navigator.pop(context);
+              if (currentRoute != reservasScreenRoute) {
+                Navigator.pushReplacementNamed(context, reservasScreenRoute);
+              }
+            },
+          ),
+
+          if (isAdmin) ...[
+            const Padding(
+              padding: EdgeInsets.fromLTRB(24, 20, 0, 8),
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  "GERENCIAMENTO",
+                  style: TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.bold,
+                    color: blackColor40,
+                    letterSpacing: 0.5,
+                  ),
+                ),
+              ),
+            ),
+            _DrawerItem(
+              icon: Icons.person_add,
+              label: "Gestão de Usuários",
+              isActive: currentRoute == accessManagementScreenRoute,
+              onTap: () {
+                Navigator.pop(context);
+                if (currentRoute != accessManagementScreenRoute) {
+                  Navigator.pushReplacementNamed(
+                      context, accessManagementScreenRoute);
+                }
+              },
+            ),
+          ],
 
           const Spacer(),
-          const Divider(),
+          
+          const Divider(indent: 20, endIndent: 20, height: 1, thickness: 0.5, color: Color(0xFFEEEEEE)),
 
           ListTile(
-            leading: const Icon(Icons.logout, color: errorColor),
+            leading: const Icon(Icons.logout_outlined, color: Color(0xFFD32F2F)),
             title: const Text(
               "Sair da Conta",
-              style: TextStyle(color: errorColor),
+              style: TextStyle(color: Color(0xFFD32F2F), fontWeight: FontWeight.w600),
             ),
             onTap: () => _confirmSignOut(context, ref),
           ),
-          const SizedBox(height: defaultPadding),
+
+          Padding(
+            padding: const EdgeInsets.fromLTRB(24, 8, 24, 12),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  "v2.6.0-premium",
+                  style: TextStyle(
+                    fontSize: 11,
+                    color: Colors.black.withValues(alpha: 0.2),
+                  ),
+                ),
+                Container(
+                  width: 20,
+                  height: 2,
+                  color: Colors.black.withValues(alpha: 0.1),
+                ),
+              ],
+            ),
+          ),
         ],
       ),
     );
@@ -90,68 +223,65 @@ class AppDrawer extends ConsumerWidget {
   }
 }
 
-class _AdminMenuSection extends ConsumerStatefulWidget {
-  @override
-  ConsumerState<_AdminMenuSection> createState() => _AdminMenuSectionState();
-}
+class _DrawerItem extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final bool isActive;
+  final bool hasBadge;
+  final VoidCallback onTap;
 
-class _AdminMenuSectionState extends ConsumerState<_AdminMenuSection> {
-  bool _isAdmin = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _checkAdmin();
-  }
-
-  Future<void> _checkAdmin() async {
-    // Reutilizando a lógica de busca de role
-    final user = FirebaseAuth.instance.currentUser;
-    if (user != null) {
-      final dbRef = FirebaseDatabase.instance.ref('usuarios/${user.uid}');
-      final snapshot = await dbRef.get();
-      if (snapshot.exists) {
-        final data = snapshot.value as Map?;
-        if (mounted) {
-          setState(() {
-            _isAdmin = (data?['role'] as String?) == 'administrador';
-          });
-        }
-      }
-    }
-  }
+  const _DrawerItem({
+    required this.icon,
+    required this.label,
+    required this.isActive,
+    this.hasBadge = false,
+    required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
-    if (!_isAdmin) return const SizedBox.shrink();
-
-    return Column(
-      children: [
-        ListTile(
-          leading: const Icon(Icons.people_outline, color: primaryColor),
-          title: const Text("Gestão de Usuários"),
-          onTap: () {
-            Navigator.pop(context);
-            Navigator.pushNamed(context, accessManagementScreenRoute);
-          },
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
+      child: Material(
+        color: isActive ? primaryColor : Colors.transparent,
+        borderRadius: BorderRadius.circular(10),
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(10),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            child: Row(
+              children: [
+                Icon(
+                  icon,
+                  size: 24,
+                  color: isActive ? Colors.white : const Color(0xFF616161),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Text(
+                    label,
+                    style: TextStyle(
+                      color: isActive ? Colors.white : const Color(0xFF616161),
+                      fontSize: 15,
+                      fontWeight: isActive ? FontWeight.bold : FontWeight.w500,
+                    ),
+                  ),
+                ),
+                if (hasBadge)
+                  Container(
+                    width: 6,
+                    height: 6,
+                    decoration: const BoxDecoration(
+                      color: Color(0xFFD32F2F),
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+              ],
+            ),
+          ),
         ),
-        ListTile(
-          leading: const Icon(Icons.bar_chart, color: primaryColor),
-          title: const Text("Relatório Financeiro"),
-          onTap: () {
-            Navigator.pop(context);
-            Navigator.pushNamed(context, financialReportScreenRoute);
-          },
-        ),
-        ListTile(
-          leading: const Icon(Icons.home_work_outlined, color: primaryColor),
-          title: const Text("Gerenciar Moradores"),
-          onTap: () {
-            Navigator.pop(context);
-            Navigator.pushNamed(context, residentsScreenRoute);
-          },
-        ),
-      ],
+      ),
     );
   }
 }

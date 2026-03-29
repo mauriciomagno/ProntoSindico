@@ -11,7 +11,7 @@ class AuthService {
   );
   final FirebaseDatabase _database = FirebaseDatabase.instanceFor(
       app: FirebaseDatabase.instance.app,
-      databaseURL: 'https://prontosindico-59bd4-default-rtdb.firebaseio.com');
+      databaseURL: FirebaseDatabase.instance.app.options.databaseURL);
 
   Future<User?> signInWithGoogle() async {
     try {

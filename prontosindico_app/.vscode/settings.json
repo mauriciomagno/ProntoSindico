@@ -1,5 +1,5 @@
 {
-    "java.configuration.updateBuildConfiguration": "automatic",
+    "java.configuration.updateBuildConfiguration": "disabled",
     "java.configuration.runtimes": [
         {
             "name": "JavaSE-21",
@@ -7,5 +7,14 @@
             "default": true
         }
     ],
-    "java.jdt.ls.java.home": "D:\\Android Studio\\jbr"
+    "java.jdt.ls.java.home": "D:\\Android Studio\\jbr",
+    "java.import.gradle.enabled": false,
+    "java.import.maven.enabled": false,
+    "java.project.sourcePaths": [],
+    "files.exclude": {
+        "**/.gradle": true,
+        "**/android/.gradle": true,
+        "**/android/build": true,
+        "**/.dart_tool": true
+    }
 }

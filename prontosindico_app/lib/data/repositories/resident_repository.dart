@@ -32,33 +32,33 @@ class ResidentRepository implements IResidentRepository {
 
         final List<Resident> residents = [];
 
-        // Iterar sobre os boletos em vez dos usuários para garantir que todos os registros sejam vistos
+        // Iterar sobre os boletos em vez dos usuários para garantir que todos os registros sejam vistos.
+        // O novo padrão vincula boletos diretamente via moradorId e usuarioId.
         billsMap.forEach((billId, bData) {
           if (bData is! Map) return;
-          
+
           final String userUid = bData['usuarioId']?.toString() ?? '';
+          final String moradorId = bData['moradorId']?.toString() ?? '';
           if (userUid.isEmpty) return;
 
           // Buscar dados do usuário
           AppUser appUser;
           final userData = usersMap[userUid];
-          
+
           if (userData is Map) {
             final userMapStr = Map<String, dynamic>.from(userData);
             final role = UserRole.fromString(userMapStr['role']?.toString() ?? 'morador');
-            
+
             appUser = AppUser(
               uid: userUid,
               email: userMapStr['email']?.toString() ?? '',
               name: userMapStr['nome']?.toString() ?? '',
               role: role,
-              isActive: _parseAtivo(userMapStr['ativo']),
+              isActive: _parseAtivo(userMapStr['ativo']), // Agora boolean no Firebase
               photoUrl: userMapStr['Foto']?.toString(),
               phone: userMapStr['telefone']?.toString(),
             );
           } else {
-            // Caso o usuário não exista no nó 'usuarios', cria um placeholder
-            // para não perder o registro financeiro do boleto.
             appUser = AppUser(
               uid: userUid,
               email: '',
@@ -68,20 +68,21 @@ class ResidentRepository implements IResidentRepository {
             );
           }
 
-          // Buscar apartamento em 'moradores'
+          // Buscar apartamento em 'moradores' usando o moradorId direto do boleto
           String? apartment;
-          residentsMap.forEach((mId, mData) {
-            if (mData is Map && mData['usuarioId'] == userUid) {
+          if (moradorId.isNotEmpty) {
+            final mData = residentsMap[moradorId];
+            if (mData is Map) {
               apartment = mData['apartamento']?.toString();
             }
-          });
+          }
 
           residents.add(Resident(
             id: billId.toString(),
             user: appUser,
             apartment: apartment,
-            hasPaid: _parseAtivo(bData['pagamentoRealizado']),
-            createdAt: _parseDate(bData['dataCriacao']),
+            hasPaid: _parseAtivo(bData['pagamentoRealizado']), // Agora boolean no Firebase
+            createdAt: _parseDate(bData['dataCriacao']), // Formato yyyy-MM-dd
           ));
         });
 
@@ -93,19 +94,21 @@ class ResidentRepository implements IResidentRepository {
   @override
   Future<void> updatePaymentStatus(String billId, bool hasPaid) async {
     final billsRef = _db.ref('boletos');
-    // Agora atualizamos diretamente pelo ID do boleto, que é mais robusto
+    // Atualiza diretamente pelo ID do boleto usando boolean, conforme o Firebase
     await billsRef.child(billId).update({
-      'pagamentoRealizado': hasPaid ? 'Sim' : 'Não',
+      'pagamentoRealizado': hasPaid,
+      'dataPagamento': hasPaid ? DateTime.now().toIso8601String().substring(0, 10) : '',
     });
   }
 
   @override
   Future<void> generateMonthlyBills() async {
     final now = DateTime.now();
-    final dataCriacaoStr = "${now.day.toString().padLeft(2, '0')}/${now.month.toString().padLeft(2, '0')}/${now.year}";
+    // Datas no formato ISO yyyy-MM-dd, conforme os dados existentes no Firebase
+    final dataCriacaoStr = now.toIso8601String().substring(0, 10);
     
-    final dueDate = now.add(const Duration(days: 10));
-    final vencimentoStr = "${dueDate.day.toString().padLeft(2, '0')}/${dueDate.month.toString().padLeft(2, '0')}/${dueDate.year}";
+    final dueDate = DateTime(now.year, now.month + 1, now.day);
+    final vencimentoStr = dueDate.toIso8601String().substring(0, 10);
 
     final usersSnapshot = await _db.ref('usuarios').get();
     final residentsSnapshot = await _db.ref('moradores').get();
@@ -119,11 +122,12 @@ class ResidentRepository implements IResidentRepository {
 
     for (final entry in usersMap.entries) {
       final userData = entry.value;
-      if (userData is! Map || userData['ativo'] != 'Sim') continue;
+      // 'ativo' é boolean no novo padrão
+      if (userData is! Map || _parseAtivo(userData['ativo']) != true) continue;
       
       final userUid = entry.key.toString();
       
-      // Encontrar moradorId para este usuarioId
+      // Encontrar moradorId para este usuarioId no nó de moradores
       String? moradorId;
       residentsMap.forEach((mId, mData) {
         if (mData is Map && mData['usuarioId'] == userUid) {
@@ -132,17 +136,12 @@ class ResidentRepository implements IResidentRepository {
       });
 
       if (moradorId != null) {
-        // Criar boleto para este usuário no mês atual
-        // Usamos uma chave composta por userId e mes_ano para evitar duplicidade rápida ou apenas o userId se o padrão for um boleto por vez
-        // Seguindo o código anterior, ele usa o userId como chave em alguns casos.
-        // Vamos usar o userId como chave principal para manter a simplicidade ou um push() se preferir lista.
-        // O usuário pediu "crie uma lista", então usaremos push().
-        
+        // Evitar duplicatas para o mês atual se necessário (opcional, dependendo da regra de negócio)
         await billsRef.push().set({
           'usuarioId': userUid,
           'moradorId': moradorId,
           'dataCriacao': dataCriacaoStr,
-          'pagamentoRealizado': 'Não',
+          'pagamentoRealizado': false, // Boolean
           'vencimentoPagamento': vencimentoStr,
           'dataPagamento': '',
         });
@@ -153,7 +152,10 @@ class ResidentRepository implements IResidentRepository {
   bool _parseAtivo(dynamic value) {
     if (value == null) return false;
     if (value is bool) return value;
-    if (value is String) return value.toLowerCase() == 'sim';
+    if (value is String) {
+      final v = value.toLowerCase();
+      return v == 'sim' || v == 'true' || v == '1';
+    }
     if (value is int) return value == 1;
     return false;
   }

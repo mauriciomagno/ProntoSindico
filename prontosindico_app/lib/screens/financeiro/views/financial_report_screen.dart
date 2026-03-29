@@ -1,25 +1,32 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:prontosindico/constants.dart';
+import 'package:prontosindico/components/app_drawer.dart';
 
-class FinancialReportScreen extends StatelessWidget {
+class FinancialReportScreen extends ConsumerWidget {
   const FinancialReportScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
       backgroundColor: backgroundLightColor,
+      drawer: const AppDrawer(),
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: primaryColor),
-          onPressed: () => Navigator.pop(context),
+        leading: Builder(
+          builder: (context) => IconButton(
+            icon: const Icon(Icons.menu, color: primaryColor),
+            onPressed: () => Scaffold.of(context).openDrawer(),
+          ),
         ),
         title: Image.asset(
           'assets/logo/logo.png',
           height: 32,
-          errorBuilder: (context, error, stackTrace) => Text("ProntoSindico", style: TextStyle(color: primaryColor, fontWeight: FontWeight.bold)),
+          errorBuilder: (_, __, ___) => const Text("ProntoSindico",
+              style:
+                  TextStyle(color: primaryColor, fontWeight: FontWeight.bold)),
         ),
         centerTitle: true,
         actions: [

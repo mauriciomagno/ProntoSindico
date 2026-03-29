@@ -5,6 +5,8 @@ import 'package:prontosindico/constants.dart';
 import 'package:prontosindico/domain/entities/resident.dart';
 import 'package:prontosindico/ui/features/residents/controllers/residents_controller.dart';
 
+import 'package:prontosindico/components/app_drawer.dart';
+
 class ResidentsScreen extends ConsumerWidget {
   const ResidentsScreen({super.key});
 
@@ -14,8 +16,25 @@ class ResidentsScreen extends ConsumerWidget {
     final colorScheme = Theme.of(context).colorScheme;
 
     return Scaffold(
+      backgroundColor: backgroundLightColor,
+      drawer: const AppDrawer(),
       appBar: AppBar(
-        title: const Text("Gerenciar Moradores"),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        leading: Builder(
+          builder: (context) => IconButton(
+            icon: const Icon(Icons.menu, color: primaryColor),
+            onPressed: () => Scaffold.of(context).openDrawer(),
+          ),
+        ),
+        title: Image.asset(
+          'assets/logo/logo.png',
+          height: 32,
+          errorBuilder: (_, __, ___) => const Text("ProntoSindico",
+              style:
+                  TextStyle(color: primaryColor, fontWeight: FontWeight.bold)),
+        ),
+        centerTitle: true,
       ),
       body: _buildBody(context, ref, state, colorScheme),
     );

@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:prontosindico/constants.dart';
+import 'package:prontosindico/components/app_drawer.dart';
 import 'package:prontosindico/providers/user_profile_providers.dart';
 import 'package:prontosindico/ui/features/user_profile/states/user_profile_state.dart';
 
@@ -170,6 +171,8 @@ class _UserInfoScreenState extends ConsumerState<UserInfoScreen> {
     });
 
     return Scaffold(
+      backgroundColor: backgroundLightColor,
+      drawer: const AppDrawer(),
       appBar: _buildAppBar(state),
       body: _buildBody(context, state),
     );
@@ -180,7 +183,21 @@ class _UserInfoScreenState extends ConsumerState<UserInfoScreen> {
     final isSaving = state is UserProfileSaving;
 
     return AppBar(
-      title: const Text('Meus Dados'),
+      backgroundColor: Colors.transparent,
+      elevation: 0,
+      leading: Builder(
+        builder: (context) => IconButton(
+          icon: const Icon(Icons.menu, color: primaryColor),
+          onPressed: () => Scaffold.of(context).openDrawer(),
+        ),
+      ),
+      title: Image.asset(
+        'assets/logo/logo.png',
+        height: 32,
+        errorBuilder: (_, __, ___) => const Text("ProntoSindico",
+            style: TextStyle(color: primaryColor, fontWeight: FontWeight.bold)),
+      ),
+      centerTitle: true,
       actions: [
         if (!_isEditing && loaded != null)
           TextButton(

@@ -24,9 +24,11 @@ class AuthRepository implements IAuthRepository {
         _usuariosRef = usuariosRef ??
             FirebaseDatabase.instanceFor(
               app: FirebaseDatabase.instance.app,
-              databaseURL:
-                  'https://prontosindico-59bd4-default-rtdb.firebaseio.com',
-            ).ref('usuarios');
+              databaseURL: FirebaseDatabase.instance.app.options.databaseURL,
+            ).ref('usuarios') {
+    final dbUrl = FirebaseDatabase.instance.app.options.databaseURL;
+    debugPrint('[AuthRepository] Using databaseURL: $dbUrl');
+  }
 
   @override
   Stream<User?> get authStateChanges => _firebaseAuth.authStateChanges();
@@ -46,11 +48,22 @@ class AuthRepository implements IAuthRepository {
 
     final UserCredential userCredential =
         await _firebaseAuth.signInWithCredential(credential);
+    debugPrint('[AuthRepository] signInWithCredential success');
     final User? firebaseUser = userCredential.user;
-    if (firebaseUser == null) return null;
+    if (firebaseUser == null) {
+      debugPrint('[AuthRepository] firebaseUser is null');
+      return null;
+    }
 
-    await _persistNewUser(firebaseUser);
-    return fetchUserData(firebaseUser.uid);
+    debugPrint('[AuthRepository] Persisting new user: ${firebaseUser.uid}');
+    try {
+      await _persistNewUser(firebaseUser);
+      debugPrint('[AuthRepository] Persistence complete, fetching data...');
+      return fetchUserData(firebaseUser.uid);
+    } catch (e) {
+      debugPrint('[AuthRepository] Error during post-login flow: $e');
+      rethrow;
+    }
   }
 
   @override
@@ -161,26 +174,32 @@ class AuthRepository implements IAuthRepository {
     // Dynamic Admin Check
     bool isAdmin = false;
     try {
-      final adminsSnapshot = await _usuariosRef.parent!.child('config/admins').get();
+      debugPrint('[AuthRepository] Checking admin status for ${firebaseUser.email}');
+      final adminsSnapshot = await _usuariosRef.parent!.child('config/admins').get().timeout(const Duration(seconds: 5));
       if (adminsSnapshot.exists) {
         final adminsData = adminsSnapshot.value;
+        debugPrint('[AuthRepository] Admins node found: $adminsData');
         if (adminsData is Map) {
           isAdmin = adminsData.values.contains(firebaseUser.email);
         } else if (adminsData is List) {
           isAdmin = adminsData.contains(firebaseUser.email);
         }
+      } else {
+        debugPrint('[AuthRepository] No config/admins node found');
       }
     } catch (e) {
-      debugPrint('[AuthRepository] Error fetching admins: $e');
+      debugPrint('[AuthRepository] Error fetching admins (ignoring): $e');
     }
 
     final String role = isAdmin ? 'administrador' : 'morador';
+    debugPrint('[AuthRepository] Persisting as role: $role');
 
     await userRef.set({
       'email': firebaseUser.email ?? '',
       'nome': firebaseUser.displayName ?? '',
       'role': role,
-      'ativo': 'Não',
+      'ativo': true, // Temporariamente true para facilitar testes e garantir redirecionamento
     });
+    debugPrint('[AuthRepository] User persisted successfully');
   }
 }

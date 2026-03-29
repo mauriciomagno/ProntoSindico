@@ -18,7 +18,7 @@ class OnbordingContent extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        const Spacer(),
+        const Spacer(flex: 2),
 
         if (isTextOnTop)
           OnbordTitleDescription(
@@ -27,12 +27,14 @@ class OnbordingContent extends StatelessWidget {
           ),
         if (isTextOnTop) const Spacer(),
 
-        /// if you are using SVG then replace [Image.asset] with [SvgPicture.asset]
-
-        Image.asset(
-          image,
-          height: 250,
+        Flexible(
+          flex: 10,
+          child: Image.asset(
+            image,
+            fit: BoxFit.contain,
+          ),
         ),
+        
         if (!isTextOnTop) const Spacer(),
         if (!isTextOnTop)
           OnbordTitleDescription(
@@ -40,7 +42,7 @@ class OnbordingContent extends StatelessWidget {
             description: description,
           ),
 
-        const Spacer(),
+        const Spacer(flex: 2),
       ],
     );
   }

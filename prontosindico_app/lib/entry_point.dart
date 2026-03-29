@@ -1,10 +1,7 @@
 import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_animate/flutter_animate.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:prontosindico/constants.dart';
 import 'package:prontosindico/route/screen_export.dart';
-import 'package:prontosindico/components/app_drawer.dart';
 
 class EntryPoint extends StatefulWidget {
   const EntryPoint({super.key});
@@ -16,8 +13,9 @@ class EntryPoint extends StatefulWidget {
 class _EntryPointState extends State<EntryPoint> {
   final List _pages = const [
     HomeScreen(),
+    AccessManagementScreen(),
+    FinancialReportScreen(),
     MuralScreen(),
-    ReservasScreen(),
     ProfileScreen(),
   ];
   int _currentIndex = 0;
@@ -32,48 +30,7 @@ class _EntryPointState extends State<EntryPoint> {
 
   @override
   Widget build(BuildContext context) {
-    SvgPicture svgIcon(String src, {Color? color}) {
-      return SvgPicture.asset(
-        src,
-        height: 24,
-        colorFilter: ColorFilter.mode(
-            color ??
-                Theme.of(context).iconTheme.color!.withValues(
-                    alpha: Theme.of(context).brightness == Brightness.dark ? 0.3 : 1),
-            BlendMode.srcIn),
-      );
-    }
-
     return Scaffold(
-      appBar: AppBar(
-        // pinned: true,
-        // floating: true,
-        // snap: true,
-        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-        leading: Builder(
-          builder: (context) => IconButton(
-            onPressed: () => Scaffold.of(context).openDrawer(),
-            icon: SvgPicture.asset(
-              "assets/icons/DotsH.svg",
-              height: 24,
-              colorFilter: ColorFilter.mode(
-                  Theme.of(context).iconTheme.color!,
-                  BlendMode.srcIn),
-            ),
-          ),
-        ),
-        leadingWidth: 56,
-        centerTitle: false,
-        title: Image.asset(
-          "assets/logo/logo.png",
-          color: Theme.of(context).iconTheme.color!,
-          height: 20,
-          width: 100,
-        ).animate().fadeIn().moveX(begin: -20),
-        actions: const [],
-      ),
-      drawer: const AppDrawer(),
-      // body: _pages[_currentIndex],
       body: PageTransitionSwitcher(
         duration: defaultDuration,
         transitionBuilder: (child, animation, secondAnimation) {
@@ -86,9 +43,9 @@ class _EntryPointState extends State<EntryPoint> {
         child: _pages[_currentIndex],
       ),
       bottomNavigationBar: Container(
-        padding: const EdgeInsets.only(top: defaultPadding / 2),
+        padding: const EdgeInsets.only(top: 8),
         decoration: BoxDecoration(
-          color: Theme.of(context).cardColor,
+          color: Colors.white,
           boxShadow: [
             BoxShadow(
               color: Colors.black.withValues(alpha: 0.05),
@@ -106,44 +63,37 @@ class _EntryPointState extends State<EntryPoint> {
               });
             }
           },
-          backgroundColor: Theme.of(context).cardColor,
+          backgroundColor: Colors.white,
           type: BottomNavigationBarType.fixed,
-          // selectedLabelStyle: TextStyle(color: primaryColor),
-          selectedFontSize: 12,
+          selectedFontSize: 11,
+          unselectedFontSize: 11,
           selectedItemColor: primaryColor,
-          unselectedItemColor:
-              Theme.of(context).iconTheme.color!.withValues(alpha: 0.4),
+          unselectedItemColor: blackColor20,
           items: [
-            BottomNavigationBarItem(
-              icon: svgIcon("assets/icons/ProntoSindico.svg"),
-              activeIcon:
-                  svgIcon("assets/icons/ProntoSindico.svg", color: primaryColor)
-                      .animate()
-                      .scale(duration: 200.ms),
-              label: "Início",
+            const BottomNavigationBarItem(
+              icon: Icon(Icons.grid_view_outlined),
+              activeIcon: Icon(Icons.grid_view),
+              label: "INÍCIO",
             ),
-            BottomNavigationBarItem(
-              icon: svgIcon("assets/icons/Category.svg"),
-              activeIcon:
-                  svgIcon("assets/icons/Category.svg", color: primaryColor)
-                      .animate()
-                      .scale(duration: 200.ms),
-              label: "Mural",
+            const BottomNavigationBarItem(
+              icon: Icon(Icons.group_outlined),
+              activeIcon: Icon(Icons.group),
+              label: "USUÁRIOS",
             ),
-            BottomNavigationBarItem(
-              icon: svgIcon("assets/icons/Bag.svg"),
-              activeIcon: svgIcon("assets/icons/Bag.svg", color: primaryColor)
-                  .animate()
-                  .scale(duration: 200.ms),
-              label: "Reservas",
+            const BottomNavigationBarItem(
+              icon: Icon(Icons.account_balance_wallet_outlined),
+              activeIcon: Icon(Icons.account_balance_wallet),
+              label: "FINANCEIRO",
             ),
-            BottomNavigationBarItem(
-              icon: svgIcon("assets/icons/Profile.svg"),
-              activeIcon:
-                  svgIcon("assets/icons/Profile.svg", color: primaryColor)
-                      .animate()
-                      .scale(duration: 200.ms),
-              label: "Perfil",
+            const BottomNavigationBarItem(
+              icon: Icon(Icons.campaign_outlined),
+              activeIcon: Icon(Icons.campaign),
+              label: "AVISOS",
+            ),
+            const BottomNavigationBarItem(
+              icon: Icon(Icons.person_outline),
+              activeIcon: Icon(Icons.person),
+              label: "PERFIL",
             ),
           ],
         ),

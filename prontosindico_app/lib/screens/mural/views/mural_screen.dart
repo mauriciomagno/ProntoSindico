@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:prontosindico/constants.dart';
 
+import 'package:prontosindico/components/app_drawer.dart';
+
 class MuralScreen extends StatelessWidget {
   const MuralScreen({super.key});
 
@@ -9,6 +11,7 @@ class MuralScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: backgroundLightColor,
+      drawer: const AppDrawer(),
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -21,20 +24,15 @@ class MuralScreen extends StatelessWidget {
         title: Image.asset(
           'assets/logo/logo.png',
           height: 32,
-          errorBuilder: (_, __, ___) => const Text("ProntoSindico", style: TextStyle(color: primaryColor, fontWeight: FontWeight.bold)),
+          errorBuilder: (_, __, ___) => const Text("ProntoSindico",
+              style:
+                  TextStyle(color: primaryColor, fontWeight: FontWeight.bold)),
         ),
         centerTitle: true,
         actions: [
           IconButton(
             icon: const Icon(Icons.notifications_none, color: primaryColor),
             onPressed: () {},
-          ),
-          const Padding(
-            padding: EdgeInsets.only(right: 16),
-            child: CircleAvatar(
-              radius: 16,
-              backgroundImage: NetworkImage('https://i.pravatar.cc/150?u=a042581f4e29026704d'),
-            ),
           ),
         ],
       ),

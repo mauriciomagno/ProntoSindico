@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:prontosindico/data/repositories/auth_repository.dart';
@@ -30,6 +31,12 @@ final userDataStreamProvider =
     StreamProvider.autoDispose.family<AppUser?, String>(
   (ref, uid) => ref.watch(authRepositoryProvider).watchUserData(uid),
 );
+
+final userProfileProvider = StreamProvider.autoDispose<AppUser?>((ref) {
+  final authUser = ref.watch(authStateChangesProvider).value;
+  if (authUser == null) return Stream.value(null);
+  return ref.watch(authRepositoryProvider).watchUserData(authUser.uid);
+});
 
 /// Provedor do controller de login (Notifier - riverpod v3).
 final loginControllerProvider = NotifierProvider<LoginController, LoginState>(

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:prontosindico/components/dot_indicators.dart';
 import 'package:prontosindico/constants.dart';
-import 'package:prontosindico/ui/features/auth/views/auth_wrapper.dart';
+import 'package:prontosindico/ui/features/auth/views/login_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'components/onbording_content.dart';
@@ -59,7 +59,7 @@ class _OnBordingScreenState extends State<OnBordingScreen> {
     await prefs.setBool('onboarding_seen', true);
     if (!mounted) return;
     Navigator.of(context).pushAndRemoveUntil(
-      MaterialPageRoute<void>(builder: (_) => const AuthWrapper()),
+      MaterialPageRoute<void>(builder: (_) => const LoginScreen()),
       (_) => false,
     );
   }
@@ -133,6 +133,9 @@ class _OnBordingScreenState extends State<OnBordingScreen> {
                       },
                       style: ElevatedButton.styleFrom(
                         shape: const CircleBorder(),
+                        minimumSize: const Size(60, 60),
+                        fixedSize: const Size(60, 60),
+                        padding: EdgeInsets.zero,
                       ),
                       child: SvgPicture.asset(
                         "assets/icons/Arrow - Right.svg",

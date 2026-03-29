@@ -5,26 +5,33 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:prontosindico/firebase_options.dart';
 import 'package:prontosindico/route/router.dart' as router;
-import 'package:prontosindico/screens/onbording/views/onbording_screnn.dart';
+import 'package:prontosindico/screens/onbording/views/onboarding_screen.dart';
 import 'package:prontosindico/theme/app_theme.dart';
 import 'package:prontosindico/ui/features/auth/views/auth_wrapper.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+  try {
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+    debugPrint('[Firebase] Inicializado com sucesso para: ${DefaultFirebaseOptions.currentPlatform.projectId}');
+  } catch (e) {
+    debugPrint('[Firebase] Erro CRÍTICO na inicialização: $e');
+    // Em caso de erro aqui, o app provavelmente falhará em seguida.
+  }
   
   // App Check initialization (Check Logcat for debug token)
   await FirebaseAppCheck.instance.activate(
-    androidProvider: kDebugMode ? AndroidProvider.debug : AndroidProvider.playIntegrity,
-    appleProvider: kDebugMode ? AppleProvider.debug : AppleProvider.deviceCheck,
+    providerAndroid: kDebugMode ? const AndroidDebugProvider() : const AndroidPlayIntegrityProvider(),
+    providerApple: kDebugMode ? const AppleDebugProvider() : const AppleDeviceCheckProvider(),
   );
 
 
   // Lê o estado do onboarding ANTES do runApp para evitar race conditions.
-  // Assim, a decisão de rota é determinística desde o primeiro frame.
+  // O onboarding é exibido apenas na primeira execução, em qualquer ambiente.
+  // Após o usuário concluir ou pular, 'onboarding_seen' é salvo e ele não verá novamente.
   final prefs = await SharedPreferences.getInstance();
   final bool onboardingSeen = prefs.getBool('onboarding_seen') ?? false;
   runApp(ProviderScope(child: MyApp(onboardingSeen: onboardingSeen)));

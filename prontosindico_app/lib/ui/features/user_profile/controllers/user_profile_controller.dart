@@ -18,7 +18,7 @@ class UserProfileController extends Notifier<UserProfileState> {
     _auth = FirebaseAuth.instance;
     _usuariosRef = FirebaseDatabase.instanceFor(
       app: FirebaseDatabase.instance.app,
-      databaseURL: 'https://prontosindico-59bd4-default-rtdb.firebaseio.com',
+      databaseURL: FirebaseDatabase.instance.app.options.databaseURL,
     ).ref('usuarios');
     _storage = FirebaseStorage.instance;
     return const UserProfileInitial();
