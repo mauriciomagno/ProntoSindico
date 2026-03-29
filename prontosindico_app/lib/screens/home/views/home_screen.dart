@@ -40,10 +40,12 @@ class HomeScreen extends ConsumerWidget {
             child: CircleAvatar(
               radius: 18,
               backgroundColor: const Color(0xFFE2E8F0),
-              backgroundImage: (userProfile?.photoUrl != null && userProfile!.photoUrl!.isNotEmpty)
+              backgroundImage: (userProfile?.photoUrl != null &&
+                      userProfile!.photoUrl!.isNotEmpty)
                   ? NetworkImage(userProfile.photoUrl!)
                   : null,
-              child: (userProfile?.photoUrl == null || userProfile!.photoUrl!.isEmpty)
+              child: (userProfile?.photoUrl == null ||
+                      userProfile!.photoUrl!.isEmpty)
                   ? const Icon(Icons.person, color: Color(0xFF64748B), size: 18)
                   : null,
             ),
@@ -75,7 +77,7 @@ class HomeScreen extends ConsumerWidget {
                 ),
               ),
               const Text(
-                'Residencial Skyline',
+                'Edifício Monet',
                 style: TextStyle(
                   fontSize: 16,
                   color: Color(0xFF64748B),
@@ -84,7 +86,7 @@ class HomeScreen extends ConsumerWidget {
               const SizedBox(height: 32),
               _buildModernStatsCard(context, homeStats),
               const SizedBox(height: 24),
-              if (homeStats.isAdmin) 
+              if (homeStats.isAdmin)
                 _buildAdminActions(context, ref, homeStats),
             ],
           ).animate().fadeIn(duration: 400.ms).moveY(begin: 10, end: 0),
@@ -95,7 +97,7 @@ class HomeScreen extends ConsumerWidget {
 
   Widget _buildModernStatsCard(BuildContext context, HomeStatsState state) {
     final double percent = state.paidPercentage;
-    
+
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(24),
@@ -139,7 +141,8 @@ class HomeScreen extends ConsumerWidget {
                 ],
               ),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                 decoration: BoxDecoration(
                   color: const Color(0xFFF0F9FF),
                   borderRadius: BorderRadius.circular(20),
@@ -198,11 +201,16 @@ class HomeScreen extends ConsumerWidget {
           const SizedBox(height: 32),
           const Divider(color: Color(0xFFF1F5F9), height: 1),
           const SizedBox(height: 20),
-          _buildAmountRow('Unidades Pagas', state.paidCount.toString(), const Color(0xFF10B981)),
+          _buildAmountRow('Unidades Pagas', state.paidCount.toString(),
+              const Color(0xFF10B981)),
           const SizedBox(height: 12),
-          _buildAmountRow('Unidades Pendentes', state.pendingCount.toString(), const Color(0xFFF59E0B)),
+          _buildAmountRow('Unidades Pendentes', state.pendingCount.toString(),
+              const Color(0xFFF59E0B)),
           const SizedBox(height: 12),
-          _buildAmountRow('Total Unidades', (state.paidCount + state.pendingCount).toString(), const Color(0xFF6366F1)),
+          _buildAmountRow(
+              'Total Unidades',
+              (state.paidCount + state.pendingCount).toString(),
+              const Color(0xFF6366F1)),
         ],
       ),
     );
@@ -219,7 +227,10 @@ class HomeScreen extends ConsumerWidget {
         const SizedBox(width: 12),
         Text(
           label,
-          style: const TextStyle(fontSize: 14, color: Color(0xFF475569), fontWeight: FontWeight.w500),
+          style: const TextStyle(
+              fontSize: 14,
+              color: Color(0xFF475569),
+              fontWeight: FontWeight.w500),
         ),
         const Spacer(),
         Text(
@@ -234,7 +245,8 @@ class HomeScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildAdminActions(BuildContext context, WidgetRef ref, HomeStatsState state) {
+  Widget _buildAdminActions(
+      BuildContext context, WidgetRef ref, HomeStatsState state) {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(20),
@@ -247,12 +259,17 @@ class HomeScreen extends ConsumerWidget {
         children: [
           const Text(
             'GESTÃO ADMINISTRATIVA',
-            style: TextStyle(color: Colors.white54, fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 1),
+            style: TextStyle(
+                color: Colors.white54,
+                fontSize: 10,
+                fontWeight: FontWeight.bold,
+                letterSpacing: 1),
           ),
           const SizedBox(height: 12),
           const Text(
             'Gerar Boletos Mensais',
-            style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.bold),
+            style: TextStyle(
+                color: Colors.white, fontSize: 15, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 4),
           const Text(
@@ -264,26 +281,36 @@ class HomeScreen extends ConsumerWidget {
             width: double.infinity,
             height: 48,
             child: ElevatedButton.icon(
-              onPressed: state.isLoading ? null : () async {
-                try {
-                  await ref.read(homeStatsControllerProvider.notifier).generateMonthlyBills();
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Boletos gerados com sucesso!')),
-                  );
-                } catch (e) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Erro ao gerar boletos: $e')),
-                  );
-                }
-              },
-              icon: state.isLoading 
-                ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
-                : const Icon(Icons.auto_awesome),
+              onPressed: state.isLoading
+                  ? null
+                  : () async {
+                      try {
+                        await ref
+                            .read(homeStatsControllerProvider.notifier)
+                            .generateMonthlyBills();
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                              content: Text('Boletos gerados com sucesso!')),
+                        );
+                      } catch (e) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text('Erro ao gerar boletos: $e')),
+                        );
+                      }
+                    },
+              icon: state.isLoading
+                  ? const SizedBox(
+                      width: 16,
+                      height: 16,
+                      child: CircularProgressIndicator(
+                          color: Colors.white, strokeWidth: 2))
+                  : const Icon(Icons.auto_awesome),
               label: const Text('GERAR MENSALIDADE AGORA'),
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF0EA5E9),
                 foregroundColor: Colors.white,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12)),
                 elevation: 0,
               ),
             ),
