@@ -38,17 +38,22 @@ android {
     }
 
     defaultConfig {
-        // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
         applicationId = "com.prontosindico.prontosindico"
-        // You can update the following values to match your application needs.
-        // For more information, see: https://flutter.dev/to/review-gradle-config.
-        minSdk = flutter.minSdkVersion  // Requerido pelo firebase_app_check e outros plugins
+        minSdk = flutter.minSdkVersion
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
     }
 
     signingConfigs {
+        // Configuração para o APK de Teste (Debug) usando a pasta que você criou
+        getByName("debug") {
+            storeFile = file("keys/debug.keystore")
+            storePassword = "android"
+            keyAlias = "androiddebugkey"
+            keyPassword = "android"
+        }
+
         create("release") {
             keyAlias = keystoreProperties.getProperty("keyAlias")
             keyPassword = keystoreProperties.getProperty("keyPassword")
@@ -58,6 +63,10 @@ android {
     }
 
     buildTypes {
+        getByName("debug") {
+            signingConfig = signingConfigs.getByName("debug")
+        }
+        
         release {
             signingConfig = signingConfigs.getByName("release")
         }

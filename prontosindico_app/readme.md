@@ -430,9 +430,9 @@ Este projeto é proprietário e confidencial. Todos os direitos reservados.
 📞 Suporte
 
 Para questões técnicas, entre em contato com o squad de desenvolvimento:
-    Tech Lead: [email]
-    Product Owner: [email]
-    Squad Mobile: [email]
+    Tech Lead: [mauricio.developer@gmail.com]
+    Product Owner: [mauricio.developer@gmail.com]
+    Squad Mobile: [mauricio.developer@gmail.com]
 
 ProntoSíndico — Simplificando a gestão do seu condomínio 🏢
 
