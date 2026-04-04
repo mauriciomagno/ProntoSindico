@@ -57,7 +57,7 @@ class NoticeCard extends StatelessWidget {
                   padding: const EdgeInsets.symmetric(
                       horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
-                    color: _getCategoryColor().withValues(alpha: 0.1),
+                    color: _getCategoryColor().withOpacity(0.1),
                     borderRadius: BorderRadius.circular(4),
                   ),
                   child: Text(

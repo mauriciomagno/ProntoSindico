@@ -40,7 +40,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       begin: Alignment.topCenter,
                       end: Alignment.bottomCenter,
                       colors: [
-                        Colors.black.withValues(alpha: 0.1),
+                        Colors.black.withOpacity(0.1),
                         Theme.of(context).scaffoldBackgroundColor,
                       ],
                     ),

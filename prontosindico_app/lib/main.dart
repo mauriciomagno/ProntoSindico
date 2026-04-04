@@ -16,18 +16,42 @@ void main() async {
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
     );
-    debugPrint('[Firebase] Inicializado com sucesso para: ${DefaultFirebaseOptions.currentPlatform.projectId}');
+    debugPrint(
+        '[Firebase] Inicializado com sucesso para: ${DefaultFirebaseOptions.currentPlatform.projectId}');
   } catch (e) {
     debugPrint('[Firebase] Erro CRÍTICO na inicialização: $e');
     // Em caso de erro aqui, o app provavelmente falhará em seguida.
   }
-  
-  // App Check initialization (Check Logcat for debug token)
+
+  // App Check initialization - OBRIGATÓRIO para produção
+  print('================================================');
+  print('🔧 INICIALIZANDO FIREBASE APP CHECK...');
+  print('================================================');
+
   await FirebaseAppCheck.instance.activate(
-    providerAndroid: kDebugMode ? const AndroidDebugProvider() : const AndroidPlayIntegrityProvider(),
-    providerApple: kDebugMode ? const AppleDebugProvider() : const AppleDeviceCheckProvider(),
+    androidProvider:
+        kDebugMode ? AndroidProvider.debug : AndroidProvider.playIntegrity,
+    appleProvider: kDebugMode ? AppleProvider.debug : AppleProvider.deviceCheck,
   );
 
+  print('✅ App Check ativado');
+  print('');
+  print('╔═══════════════════════════════════════════════════════════╗');
+  print('║   🔑 COMO OBTER O DEBUG TOKEN PARA REGISTRAR             ║');
+  print('╠═══════════════════════════════════════════════════════════╣');
+  print('║                                                           ║');
+  print('║ 1. PROCURE no console abaixo por:                        ║');
+  print('║    "Enter this debug token into the allow list"          ║');
+  print('║                                                           ║');
+  print('║ 2. OU execute este comando no terminal:                  ║');
+  print('║    adb logcat | findstr "DebugAppCheckProvider"          ║');
+  print('║                                                           ║');
+  print('║ 3. COPIE o token que aparece e registre em:              ║');
+  print('║    Firebase Console → App Check → Apps                   ║');
+  print('║    → Manage debug tokens                                 ║');
+  print('║                                                           ║');
+  print('╚═══════════════════════════════════════════════════════════╝');
+  print('');
 
   // Lê o estado do onboarding ANTES do runApp para evitar race conditions.
   // O onboarding é exibido apenas na primeira execução, em qualquer ambiente.

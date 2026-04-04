@@ -3,6 +3,6 @@ import 'package:prontosindico/ui/features/user_profile/controllers/user_profile_
 import 'package:prontosindico/ui/features/user_profile/states/user_profile_state.dart';
 
 final userProfileControllerProvider =
-    NotifierProvider.autoDispose<UserProfileController, UserProfileState>(
-  UserProfileController.new,
+    StateNotifierProvider.autoDispose<UserProfileController, UserProfileState>(
+  (ref) => UserProfileController(),
 );

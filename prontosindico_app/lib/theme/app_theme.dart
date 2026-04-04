@@ -30,12 +30,13 @@ class AppTheme {
       appBarTheme: appBarLightTheme,
       scrollbarTheme: scrollbarThemeData,
       dataTableTheme: dataTableLightThemeData,
-      cardTheme: CardThemeData(
+      cardTheme: const CardThemeData(
         elevation: 2, // Subtle elevation
-        shadowColor: Colors.black.withValues(alpha: 0.1),
+        shadowColor: Color(0x1A000000),
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(defaultBorderRadious),
-          side: BorderSide.none, // Remove border for cleaner look with elevation
+          borderRadius: BorderRadius.all(Radius.circular(defaultBorderRadious)),
+          side:
+              BorderSide.none, // Remove border for cleaner look with elevation
         ),
         color: whiteColor,
       ),
@@ -53,7 +54,8 @@ class AppTheme {
       textTheme: const TextTheme(
         bodyMedium: TextStyle(color: blackColor20),
         bodyLarge: TextStyle(color: Colors.white),
-        displayLarge: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+        displayLarge:
+            TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
       ),
       elevatedButtonTheme: elevatedButtonThemeData,
       textButtonTheme: textButtonThemeData,
@@ -65,11 +67,11 @@ class AppTheme {
       appBarTheme: appBarDarkTheme,
       scrollbarTheme: scrollbarThemeData,
       dataTableTheme: dataTableDarkThemeData,
-      cardTheme: CardThemeData(
+      cardTheme: const CardThemeData(
         elevation: 0,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(defaultBorderRadious),
-          side: const BorderSide(color: blackColor80),
+          borderRadius: BorderRadius.all(Radius.circular(defaultBorderRadious)),
+          side: BorderSide(color: blackColor80),
         ),
         color: blackColor,
       ),

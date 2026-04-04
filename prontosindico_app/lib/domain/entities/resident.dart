@@ -6,6 +6,8 @@ class Resident {
   final String? apartment;
   final bool hasPaid;
   final DateTime? createdAt;
+  final DateTime? dueDate; // Data de vencimento do boleto
+  final DateTime? referenceMonth; // Mês de referência do boleto (yyyy-MM)
 
   const Resident({
     this.id,
@@ -13,6 +15,8 @@ class Resident {
     this.apartment,
     required this.hasPaid,
     this.createdAt,
+    this.dueDate,
+    this.referenceMonth,
   });
 
   Resident copyWith({
@@ -21,6 +25,8 @@ class Resident {
     String? apartment,
     bool? hasPaid,
     DateTime? createdAt,
+    DateTime? dueDate,
+    DateTime? referenceMonth,
   }) {
     return Resident(
       id: id ?? this.id,
@@ -28,6 +34,8 @@ class Resident {
       apartment: apartment ?? this.apartment,
       hasPaid: hasPaid ?? this.hasPaid,
       createdAt: createdAt ?? this.createdAt,
+      dueDate: dueDate ?? this.dueDate,
+      referenceMonth: referenceMonth ?? this.referenceMonth,
     );
   }
 }

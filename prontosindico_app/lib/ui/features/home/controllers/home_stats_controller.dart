@@ -8,6 +8,7 @@ class HomeStatsState {
   final int pendingCount;
   final bool isLoading;
   final bool isAdmin;
+  final bool hasPaymentRealized;
   final String? error;
 
   const HomeStatsState({
@@ -15,6 +16,7 @@ class HomeStatsState {
     this.pendingCount = 0,
     this.isLoading = true,
     this.isAdmin = false,
+    this.hasPaymentRealized = false,
     this.error,
   });
 
@@ -27,6 +29,7 @@ class HomeStatsState {
     int? pendingCount,
     bool? isLoading,
     bool? isAdmin,
+    bool? hasPaymentRealized,
     String? error,
   }) {
     return HomeStatsState(
@@ -34,6 +37,7 @@ class HomeStatsState {
       pendingCount: pendingCount ?? this.pendingCount,
       isLoading: isLoading ?? this.isLoading,
       isAdmin: isAdmin ?? this.isAdmin,
+      hasPaymentRealized: hasPaymentRealized ?? this.hasPaymentRealized,
       error: error ?? this.error,
     );
   }
@@ -43,38 +47,49 @@ class HomeStatsController extends Notifier<HomeStatsState> {
   @override
   HomeStatsState build() {
     final residentsAsync = ref.watch(residentsStreamProvider);
-    
+
     // Buscar role do usuário atual de forma assíncrona
-    // Como build() deve ser síncrono no Notifier básico, 
+    // Como build() deve ser síncrono no Notifier básico,
     // vamos iniciar a busca e atualizar o estado depois.
     _checkAdminStatus();
 
     return residentsAsync.when(
       data: (residents) {
-        // Removemos o filtro rigoroso de mês/ano para que todos os boletos 
-        // cadastrados reflitam no gráfico, evitando divergências de contagem.
-        final currentMonthResidents = residents;
-        
+        // Filtrar apenas boletos com referência ao mês atual
+        final now = DateTime.now();
+        final currentMonthResidents = residents.where((r) {
+          if (r.referenceMonth == null) return false;
+          return r.referenceMonth!.year == now.year &&
+              r.referenceMonth!.month == now.month;
+        }).toList();
+
         int paid = 0;
         int pending = 0;
+        bool hasPayment = false;
 
         for (final r in currentMonthResidents) {
           if (r.hasPaid) {
             paid++;
+            hasPayment = true; // Marca que há pelo menos um pagamento realizado
           } else {
             pending++;
           }
         }
-        
+
         return HomeStatsState(
           paidCount: paid,
           pendingCount: pending,
           isLoading: false,
-          isAdmin: state.isAdmin, // Mantém o valor atual de admin
+          isAdmin: stateOrNull?.isAdmin ?? false,
+          hasPaymentRealized: hasPayment,
         );
       },
-      loading: () => HomeStatsState(isLoading: true, isAdmin: stateOrNull?.isAdmin ?? false),
-      error: (err, stack) => HomeStatsState(error: err.toString(), isLoading: false, isAdmin: stateOrNull?.isAdmin ?? false),
+      loading: () => HomeStatsState(
+          isLoading: true, isAdmin: stateOrNull?.isAdmin ?? false),
+      error: (err, stack) => HomeStatsState(
+          error: err.toString(),
+          isLoading: false,
+          isAdmin: stateOrNull?.isAdmin ?? false),
     );
   }
 
@@ -82,11 +97,12 @@ class HomeStatsController extends Notifier<HomeStatsState> {
     try {
       final user = FirebaseAuth.instance.currentUser;
       if (user != null) {
-        final snapshot = await FirebaseDatabase.instance.ref('usuarios/${user.uid}').get();
+        final snapshot =
+            await FirebaseDatabase.instance.ref('usuarios/${user.uid}').get();
         if (snapshot.exists) {
           final data = snapshot.value as Map?;
           final isAdmin = (data?['role'] as String?) == 'administrador';
-          if (state.isAdmin != isAdmin) {
+          if (stateOrNull != null && stateOrNull!.isAdmin != isAdmin) {
             state = state.copyWith(isAdmin: isAdmin);
           }
         }
@@ -94,13 +110,52 @@ class HomeStatsController extends Notifier<HomeStatsState> {
     } catch (_) {}
   }
 
-  Future<void> generateMonthlyBills() async {
-    state = state.copyWith(isLoading: true);
+  Future<bool> checkIfBillsExist() async {
     try {
-      await ref.read(residentRepositoryProvider).generateMonthlyBills();
-      // O stream watchResidents() atualizará os dados automaticamente
+      return await ref
+          .read(residentRepositoryProvider)
+          .checkMonthlyBillsExist();
     } catch (e) {
-      state = state.copyWith(isLoading: false, error: e.toString());
+      return false;
+    }
+  }
+
+  Future<void> generateMonthlyBills({bool clearExisting = false}) async {
+    // Evita acessar state se não estiver inicializado
+    try {
+      if (stateOrNull != null) {
+        state = state.copyWith(isLoading: true);
+      }
+    } catch (_) {
+      // State não inicializado, continua sem atualizar isLoading
+    }
+
+    try {
+      final repository = ref.read(residentRepositoryProvider);
+
+      if (clearExisting) {
+        await repository.clearMonthlyBills();
+      }
+
+      await repository.generateMonthlyBills();
+      // O stream watchResidents() atualizará os dados automaticamente
+
+      try {
+        if (stateOrNull != null) {
+          state = state.copyWith(isLoading: false);
+        }
+      } catch (_) {
+        // State não inicializado, ignora
+      }
+    } catch (e) {
+      try {
+        if (stateOrNull != null) {
+          state = state.copyWith(isLoading: false, error: e.toString());
+        }
+      } catch (_) {
+        // State não inicializado, ignora
+      }
+      rethrow;
     }
   }
 }
