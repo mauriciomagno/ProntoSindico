@@ -1,0 +1,11 @@
+{
+  "FLAVOR": "dev",
+  "APP_TITLE": "ProntoSindico (DEV)",
+  "API_URL": "https://dev-api.prontosindico.com",
+  "FIREBASE_PROJECT_ID": "prontosindico-59bd4",
+  "FIREBASE_APP_ID": "1:253104354974:android:TODO_DEV_APP_ID",
+  "FIREBASE_API_KEY": "AIzaSyCR50YsFWGyiR7dKcI7gZ6QE2UNJJ6hF98",
+  "FIREBASE_MESSAGING_SENDER_ID": "253104354974",
+  "ENABLE_DEBUG_BANNER": "true",
+  "IS_PRODUCTION": "false"
+}

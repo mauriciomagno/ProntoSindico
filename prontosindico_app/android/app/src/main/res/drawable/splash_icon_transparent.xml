@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Ícone invisível: retângulo sólido na cor do fundo (#0B1019).
+     Android 12+ exige um drawable válido em windowSplashScreenAnimatedIcon —
+     usar um vector vazio causa fallback para ic_launcher (logo Flutter).
+     Com a cor igual ao fundo, o "ícone" é renderizado mas não aparece. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <path
+        android:fillColor="#0B1019"
+        android:pathData="M0,0 L108,0 L108,108 L0,108 Z" />
+</vector>

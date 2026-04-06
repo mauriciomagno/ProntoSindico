@@ -1,0 +1,25 @@
+{
+    "dart.flutterSdkPath": "D:\\Projetos\\flutter_windows_3.41.4-stable\\flutter",
+    "java.configuration.updateBuildConfiguration": "disabled",
+    // "java.configuration.runtimes": [
+    //     {
+    //         "name": "JavaSE-21",
+    //         "path": "D:\\Android Studio\\jbr",
+    //         "default": true
+    //     }
+    // ],
+    // "java.jdt.ls.java.home": "D:\\Android Studio\\jbr",
+    "java.import.gradle.enabled": false,
+    "java.import.maven.enabled": false,
+    "java.project.sourcePaths": [],
+    "files.exclude": {
+        "**/.gradle": true,
+        "**/android/.gradle": true,
+        "**/android/build": true,
+        "**/.dart_tool": true
+    },
+    "cSpell.language": "en,pt,pt-BR",
+    "cSpell.enableFiletypes": [
+        "dart"
+    ]
+}

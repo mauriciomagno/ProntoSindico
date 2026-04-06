@@ -1,0 +1,10 @@
+﻿# Build outputs
+prontosindico_app/build/
+prontosindico_app/.dart_tool/
+*.apk
+*.so
+*.bin
+*.apk
+*.aab
+**/build/
+**/.dart_tool/

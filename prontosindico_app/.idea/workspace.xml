@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AndroidLayouts">
+    <shared>
+      <config />
+    </shared>
+  </component>
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="NONE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="8187f40a-dbe2-4406-bdcb-7e63e9ce7a3d" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.vscode/settings.json" beforeDir="false" afterPath="$PROJECT_DIR$/.vscode/settings.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/android/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/android/app/build.gradle.kts" beforeDir="false" afterPath="$PROJECT_DIR$/android/app/build.gradle.kts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ios/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/components/app_drawer.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/components/app_drawer.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/components/cart_button.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/components/cart_button.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/components/list_tile/divider_list_tile.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/components/list_tile/divider_list_tile.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/components/review_card.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/components/review_card.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/components/skleton/skelton.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/components/skleton/skelton.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/entry_point.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/entry_point.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/firebase_options.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/firebase_options.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/main.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/main.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/screens/access_management_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/screens/access_management_screen.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/screens/auth/views/components/login_form.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/screens/auth/views/components/login_form.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/screens/auth/views/components/sign_up_form.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/screens/auth/views/components/sign_up_form.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/screens/auth/views/signup_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/screens/auth/views/signup_screen.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/screens/financeiro/views/financial_report_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/screens/financeiro/views/financial_report_screen.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/screens/home/views/components/payment_status_chart.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/screens/home/views/components/payment_status_chart.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/screens/home/views/home_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/screens/home/views/home_screen.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/screens/mural/views/components/notice_card.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/screens/mural/views/components/notice_card.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/screens/mural/views/mural_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/screens/mural/views/mural_screen.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/screens/profile/views/components/profile_card.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/screens/profile/views/components/profile_card.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/screens/reservas/views/components/available_space_card.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/screens/reservas/views/components/available_space_card.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/screens/reservas/views/components/my_booking_card.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/screens/reservas/views/components/my_booking_card.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/screens/reservas/views/reservas_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/screens/reservas/views/reservas_screen.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/screens/user_info/views/user_info_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/screens/user_info/views/user_info_screen.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/theme/input_decoration_theme.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/theme/input_decoration_theme.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/ui/features/auth/controllers/login_controller.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/ui/features/auth/controllers/login_controller.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/ui/features/auth/states/login_state.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/ui/features/auth/states/login_state.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/ui/features/auth/views/login_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/ui/features/auth/views/login_screen.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/ui/features/residents/views/residents_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/ui/features/residents/views/residents_screen.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/ui/features/user_profile/states/user_profile_state.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/ui/features/user_profile/states/user_profile_state.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/readme.md" beforeDir="false" afterPath="$PROJECT_DIR$/readme.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/test/widget_test.dart" beforeDir="false" afterPath="$PROJECT_DIR$/test/widget_test.dart" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ClangdSettings">
+    <option name="formatViaClangd" value="false" />
+  </component>
+  <component name="FileEditorManager">
+    <leaf>
+      <file leaf-file-name="main.dart" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/lib/main.dart">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="0">
+              <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+    </leaf>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
+  </component>
+  <component name="ProblemsViewState">
+    <option name="selectedTabId" value="_Designer_Tab" />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 3
+}</component>
+  <component name="ProjectId" id="3ARMxgOrx1P71DVbgXs5M8bu7j5" />
+  <component name="ProjectView">
+    <navigator currentView="ProjectPane" proportions="" version="1" />
+    <panes>
+      <pane id="ProjectPane">
+        <option name="show-excluded-files" value="false" />
+      </pane>
+    </panes>
+  </component>
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "AnalyzeApkAction.lastApkPath": "C:/Users/MauricioAlmeida/develop/scrappbuyer4/scrappbuyer/build/app/outputs/flutter-apk/app-releasePRD-appVersion-1.0.19-buildNumber-19.apk",
+    "Flutter.main.dart.executor": "Debug",
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
+    "RunOnceActivity.cidr.known.project.marker": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "RunOnceActivity.readMode.enableVisualFormatting": "true",
+    "cf.first.check.clang-format": "false",
+    "cidr.known.project.marker": "true",
+    "com.google.services.firebase.aqiPopupShown": "true",
+    "git-widget-placeholder": "fix/refatoracao",
+    "io.flutter.project.isFirstOpen": "true",
+    "kotlin-language-version-configured": "true",
+    "last_opened_file_path": "D:/Projetos/ProntoSindico/prontosindico_app",
+    "settings.editor.selected.configurable": "preferences.pluginManager",
+    "show.migrate.to.gradle.popup": "false"
+  }
+}]]></component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="8187f40a-dbe2-4406-bdcb-7e63e9ce7a3d" name="Changes" comment="" />
+      <created>1772551179548</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1772551179548</updated>
+    </task>
+    <servers />
+  </component>
+  <component name="ToolWindowManager">
+    <editor active="true" />
+    <layout>
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+    </layout>
+  </component>
+</project>

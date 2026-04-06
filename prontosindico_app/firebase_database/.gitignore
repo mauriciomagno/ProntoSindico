@@ -1,0 +1,17 @@
+# Firebase cache
+.firebase/
+
+# Firebase local emulator data
+firebase-debug.log
+firebase-debug.*.log
+firestore-debug.log
+database-debug.log
+ui-debug.log
+
+# Service Account Keys (se houver)
+*service-account*.json
+*serviceAccountKey*.json
+
+# Secrets
+.env
+.env.local

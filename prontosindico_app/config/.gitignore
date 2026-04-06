@@ -1,0 +1,11 @@
+# Ignora arquivos de configuração local/sensíveis
+*.local.json
+*.secret.json
+
+# Ignora backups
+*.backup
+*.bak
+
+# Ignora arquivos temporários
+*.tmp
+~$*
