@@ -19,8 +19,8 @@ if (keystorePropertiesFile.exists()) {
 
 android {
     namespace = "com.prontosindico.prontosindico"
-    compileSdk = 36  // Atualizado para suportar plugins mais recentes
-    ndkVersion = "27.0.12077973"  // Versão requerida pelos plugins Firebase
+    compileSdk = 36  // Atualizado para 36 para suportar novas versões das bibliotecas do AndroidX
+    ndkVersion = "28.2.13676358"
 
     externalNativeBuild {
         cmake {
@@ -29,12 +29,12 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
     }
 
     kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_17.toString()
+        jvmTarget = JavaVersion.VERSION_11.toString()
     }
 
     defaultConfig {

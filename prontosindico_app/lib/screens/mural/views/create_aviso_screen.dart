@@ -143,7 +143,7 @@ class _CreateAvisoScreenState extends ConsumerState<CreateAvisoScreen> {
                   Switch(
                     value: _sendPush,
                     onChanged: (val) => setState(() => _sendPush = val),
-                    activeColor: const Color(0xFF1E40AF),
+                    activeThumbColor: const Color(0xFF1E40AF),
                   ),
                 ],
               ),

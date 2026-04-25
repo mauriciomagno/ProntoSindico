@@ -6,7 +6,7 @@ publish_to: "none"
 version: 1.0.0+1
 
 environment:
-  sdk: ">=3.2.0 <4.0.0"
+  sdk: ">=3.5.0 <4.0.0"
 
 dependencies:
   flutter:
@@ -22,19 +22,25 @@ dependencies:
   flutter_widget_from_html_core: ^0.16.1
   animations: ^2.0.11
   url_launcher: ^6.3.0
-  firebase_core: ^4.5.0
-  firebase_auth: ^6.2.0
-  google_sign_in: 6.2.2
-  firebase_database: ^12.1.4
-  firebase_storage: ^13.1.0
+  firebase_core: 2.28.0
+  firebase_auth: 4.19.0
+  firebase_database: 10.3.0
+  firebase_storage: 11.7.0
+  firebase_app_check: ^0.2.2
+  firebase_messaging: 14.8.0
+  firebase_crashlytics: 3.5.0
+  google_sign_in: 6.2.1
   image_picker: ^1.1.2
   flutter_animate: ^4.5.0
   shimmer: ^3.0.0
   flutter_riverpod: ^2.5.1
   shared_preferences: ^2.3.2
-  firebase_app_check: ^0.4.1+5
   rxdart: ^0.28.0
   fl_chart: ^0.66.0
+  go_router: ^14.0.0
+  freezed_annotation: ^2.4.1
+  hive_flutter: ^1.1.0
+  hive: ^2.2.3
 
 dev_dependencies:
   flutter_test:
@@ -43,6 +49,8 @@ dev_dependencies:
   flutter_lints: ^5.0.0
   flutter_native_splash: ^2.3.10
   flutter_launcher_icons: ^0.14.3
+  build_runner: ^2.4.12
+  freezed: ^2.4.1
 
 flutter:
   uses-material-design: true

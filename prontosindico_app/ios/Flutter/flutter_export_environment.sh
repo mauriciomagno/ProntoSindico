@@ -1,7 +1,7 @@
 #!/bin/sh
 # This is a generated file; do not edit or check into version control.
-export "FLUTTER_ROOT=C:\Users\MauricioAlmeida\develop\flutter"
-export "FLUTTER_APPLICATION_PATH=C:\temp\ProntoSindico\ProntoSindico\ProntoSindico\ProntoSindico\prontosindico_app"
+export "FLUTTER_ROOT=D:\Projetos\flutter_windows_3.41.4-stable\flutter"
+export "FLUTTER_APPLICATION_PATH=D:\Projetos\ProntoSindico\prontosindico_app"
 export "COCOAPODS_PARALLEL_CODE_SIGN=true"
 export "FLUTTER_TARGET=lib\main.dart"
 export "FLUTTER_BUILD_DIR=build"
